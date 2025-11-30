@@ -1,7 +1,5 @@
 # BookNest 📚
 
-![BookNest Logo](screenshot.png) <!-- Replace with your screenshot or logo -->
-
 #### A personal web app to explore books, authors, and reading lists, built to learn web development tools and best practices.
 
 ## 🌟 Features
