@@ -1,1 +1,98 @@
 @import "tailwindcss";
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-weight: 400;
+  src: url("/assets/fonts/BricolageGrotesque-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-weight: 300;
+  src: url("/assets/fonts/BricolageGrotesque-Light.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-weight: 500;
+  src: url("/assets/fonts/BricolageGrotesque-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-weight: 600;
+  src: url("/assets/fonts/BricolageGrotesque-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-weight: 700;
+  src: url("/assets/fonts/BricolageGrotesque-Bold.woff2") format("woff2");
+}
+@theme {
+  --color-bg-main: #2c3639;
+  --color-bg-secondary: #3f4e4f;
+  --color-bg-tertiary: #a27b5c;
+  --color-bg-section: #dcd7c9;
+  --color-text-main: #ffff;
+  --color-text-secondary: #000000;
+  --color-error: #cc0000;
+  --breakpoint-1xl: 90rem;
+  --animate-float: float 3.7s ease-in-out infinite backwards;
+  --animate-float2: float2 3s ease-in-out infinite backwards;
+  --animate-inOut: inOut 6s ease-in-out infinite;
+
+  @keyframes float {
+    0% {
+      transform: translate(3px, 10px);
+    }
+    25% {
+      transform: translate(10px, 25px);
+    }
+    50% {
+      transform: translate(15px, 15px);
+    }
+    75% {
+      transform: translate(9px, 7px);
+    }
+    100% {
+      transform: translate(3px, 10px);
+    }
+  }
+  @keyframes float2 {
+    0% {
+      transform: translate(3px, 10px);
+    }
+    25% {
+      transform: translate(15px, 15px);
+    }
+    50% {
+      transform: translate(10px, 25px);
+    }
+    75% {
+      transform: translate(9px, 7px);
+    }
+    100% {
+      transform: translate(3px, 10px);
+    }
+  }
+  @keyframes inOut {
+    0% {
+      opacity: 0;
+      top: -20%;
+    }
+    50% {
+      opacity: 100%;
+      top: 0;
+    }
+    100% {
+      top: 150%;
+      opacity: 0;
+    }
+  }
+}
+
+body {
+  font-family: "Bricolage Grotesque";
+}
+
+html {
+  scroll-behavior: smooth;
+}
