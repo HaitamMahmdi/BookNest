@@ -38,14 +38,16 @@ export const useUserAuth = defineStore(`userAuth`, {
         throw error;
       }
     },
-    /*
-    async signIn() {
+
+    async signIn(email, password) {
       const auth = getAuth();
       try {
         await signInWithEmailAndPassword(auth, email, password);
-      } catch {}
+      } catch (error) {
+        throw error;
+      }
     },
-    */
+
     waitForAuth() {
       const auth = getAuth();
 
