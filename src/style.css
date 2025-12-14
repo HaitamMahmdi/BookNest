@@ -31,9 +31,12 @@
   --color-bg-secondary: #3f4e4f;
   --color-bg-tertiary: #a27b5c;
   --color-bg-section: #dcd7c9;
+  --color-bg-white: #ffffff;
   --color-text-main: #ffff;
   --color-text-secondary: #000000;
   --color-error: #cc0000;
+  --color-star: #ffd700;
+  --text-textLg: 18px;
   --breakpoint-1xl: 90rem;
   --animate-float: float 3.7s ease-in-out infinite backwards;
   --animate-float2: float2 3s ease-in-out infinite backwards;
@@ -87,10 +90,6 @@
       opacity: 0;
     }
   }
-}
-
-body {
-  font-family: "Bricolage Grotesque";
 }
 
 html {

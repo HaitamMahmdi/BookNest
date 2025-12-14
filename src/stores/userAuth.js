@@ -29,7 +29,7 @@ export const useUserAuth = defineStore(`userAuth`, {
         );
         this.user = auth.currentUser;
         const actionCodeSettings = {
-          url: "http://localhost:5174/",
+          url: "http://localhost:5173/",
           handleCodeInApp: false,
         };
         await sendEmailVerification(userCredential.user, actionCodeSettings);
