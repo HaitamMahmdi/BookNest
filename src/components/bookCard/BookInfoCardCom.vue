@@ -82,7 +82,11 @@ const show = ref(true);
           <p class="font-bold text-textLg mt-4">
             Categories :
             <span class="ml-2 font-normal text-[1rem]">{{
-              props.bookInfo.volumeInfo.categories[0]
+              Array.isArray(props.bookInfo.volumeInfo?.categories)
+                ? props.bookInfo.volumeInfo?.categories.reduce(
+                    (e, a) => e + " " + a
+                  )
+                : "Unknown"
             }}</span>
           </p>
         </li>
@@ -91,7 +95,11 @@ const show = ref(true);
         >
           <FontAwesomeIcon
             class="text-star"
-            v-for="star in props.bookInfo.volumeInfo.averageRating || 2"
+            v-for="star in Number.isInteger(
+              props.bookInfo.volumeInfo.averageRating
+            )
+              ? props.bookInfo.volumeInfo.averageRating
+              : 3 || 2"
             :key="star"
             :icon="faStar"
           />

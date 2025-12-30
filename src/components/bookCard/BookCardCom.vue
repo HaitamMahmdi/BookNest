@@ -10,7 +10,7 @@ console.log(bookObj);
     @click="$emit('showInfos', bookObj)"
     v-if="bookObj && bookObj.volumeInfo.imageLinks"
     :id="bookObj.id"
-    class="card cursor-pointer h-64 relative hover:-top-1 transform duration-300 top-0"
+    class="card cursor-pointer rounded-2xl overflow-hidden h-64 w-40 relative hover:-top-1 transform duration-300 top-0"
   >
     <div class="w-full h-full">
       <img
