@@ -8,33 +8,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 const props = defineProps({
   bookInfo: Object,
-  postionY: String,
-});
-console.log(props.postionY);
-const bodyHeight = ref(0);
-let observer;
-
-const updateHeight = () => {
-  bodyHeight.value = document.body.offsetHeight;
-};
-
-onMounted(() => {
-  // initial height
-  updateHeight();
-
-  // Observe body for changes
-  observer = new ResizeObserver(() => {
-    updateHeight();
-  });
-  observer.observe(document.body);
-
-  // Optional: also update on window resize
-  window.addEventListener("resize", updateHeight);
-});
-
-onBeforeUnmount(() => {
-  observer.disconnect();
-  window.removeEventListener("resize", updateHeight);
 });
 
 const show = ref(true);
@@ -42,15 +15,13 @@ const show = ref(true);
 <template>
   <div
     v-if="show"
-    :style="{ height: bodyHeight + 'px' }"
     @click.self="$emit('close')"
-    class="absolute bg-[#000000b5] w-full h-full left-0 top-0 flex justify-center"
+    class="fixed bg-[#000000b5] w-full h-screen max-md:overflow-scroll overscroll-contain left-0 top-0 md:items-end flex justify-center"
   >
     <div
-      :style="{ top: props.postionY / 2 + 'px' }"
       v-if="props.bookInfo"
       :id="props.bookInfo.id"
-      class="bg-bg-white flex h-fit max-sm:flex-wrap max-sm:justify-center max-sm:text-center p-4 max-sm:px-0 relative"
+      class="bg-bg-white flex h-fit max-sm:flex-wrap max-sm:justify-center max-sm:text-center p-4 rounded-t-2xl pt-8 max-md:top-[166px] max-sm:px-0 relative w-full"
     >
       <div
         class="min-w-40 sm:border-r border-[#ddd] pr-4 max-sm:px-0 flex flex-col justify-between"

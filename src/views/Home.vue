@@ -14,7 +14,6 @@ const books = ref(null);
   return;
 })();
 const bookDetail = ref(null);
-const postion = ref("");
 </script>
 <template>
   <div class="grid lg:grid-cols-[320px_minmax(160px,1280px)_320px]">
@@ -24,7 +23,6 @@ const postion = ref("");
         class="grid grid-cols-[repeat(auto-fit,minmax(160px,160px))] gap-4 justify-center py-10"
       >
         <BookCardCom
-          @click="(e) => (postion = e.clientY)"
           v-if="books"
           v-for="book in books"
           :key="book.id"
@@ -32,12 +30,10 @@ const postion = ref("");
           @showInfos="(bookObj) => (bookDetail = bookObj)"
         >
         </BookCardCom>
-        {{ postion }}
         <BookInfoCardCom
           @close="() => (bookDetail = null)"
           v-if="bookDetail"
           :book-info="bookDetail"
-          :postion-y="postion"
         ></BookInfoCardCom>
       </div>
     </section>
