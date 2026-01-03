@@ -19,15 +19,30 @@ export const useUserBooks = defineStore(`userBooks`, {
       const authStore = useUserAuth();
       const user = authStore.user;
       if (!user) {
-        throw new Error("User not authenticated");
+        return;
       }
       const db = getFirestore();
       const userRef = doc(db, `users`, user.uid);
       await updateDoc(userRef, {
-        books: arrayUnion(book),
+        favorites: arrayUnion(book),
+      });
+    },
+    async removeFromFavorites(bookId) {
+      const authStore = useUserAuth();
+      const user = authStore.user;
+      if (!user && !this.favorites) {
+        return;
+      }
+      this.favorites = this.favorites.filter((book) => book.id !== bookId);
+      const db = getFirestore();
+      const userRef = doc(db, `users`, user.uid);
+      await updateDoc(userRef, {
+        favorites: this.favorites,
       });
     },
     async loadUserBooks() {
+      const authStore = useUserAuth();
+      const user = authStore.user;
       const db = getFirestore();
       const userRef = doc(db, `users`, user.uid);
       if (this.unsubscribe) {
