@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
 import { useUserAuth } from "../stores/userAuth";
-import { getAuth } from "firebase/auth";
 
 const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home,
+    component: () => import("../views/Home.vue"),
+
     meta: {
       requiresAuth: true,
+      requiresEmailVerified: true,
     },
   },
   {
@@ -45,7 +45,13 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth && !authStore.user) {
     return next("/Auth");
   }
-  if (!to.meta.requiresAuth && authStore.user) {
+  if (to.meta.requiresEmailVerified && authStore.user) {
+    const user = authStore.user;
+    if (!user.emailVerified) {
+      return next("/Auth");
+    }
+  }
+  if (!to.meta.requiresAuth && authStore.user && authStore.user.emailVerified) {
     return next("/");
   }
 
