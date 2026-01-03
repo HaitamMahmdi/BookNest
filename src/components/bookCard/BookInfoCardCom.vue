@@ -1,15 +1,19 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref } from "vue";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { useUserBooks } from "../../stores/userBooks";
 import {
-  faBookmark,
   faShareFromSquare,
+  faHeart as faHeartRegular,
 } from "@fortawesome/free-regular-svg-icons";
+import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 const props = defineProps({
   bookInfo: Object,
+  isFav: Boolean,
+  isInShelf: Boolean,
 });
-
+const userBooks = useUserBooks();
 const show = ref(true);
 </script>
 <template>
@@ -35,15 +39,35 @@ const show = ref(true);
           />
         </div>
         <div class="flex flex-wrap items-center justify-between">
-          <div>
-            <FontAwesomeIcon class="text-2xl" :icon="faBookmark" />
-          </div>
-          <div>
+          <button
+            @click="
+              props.isFav
+                ? userBooks.removeFromFavorites(props.bookInfo.id)
+                : userBooks.addToFavorites(props.bookInfo)
+            "
+            :title="props.isFav ? 'remove from favorites' : 'add to favorites'"
+            class="hover:border-[#DDDD] cursor-pointer border border-transparent p-1 flex items-center justify-center"
+          >
+            <font-awesome-icon
+              :icon="faHeartSolid"
+              v-if="props.isFav"
+              class="text-2xl text-error!"
+            />
+            <font-awesome-icon :icon="faHeartRegular" v-else class="text-2xl" />
+          </button>
+          <button
+            title="add to shelf"
+            class="hover:border-[#DDDD] cursor-pointer border border-transparent p-1 flex items-center justify-center"
+          >
             <img class="w-7" src="/assets/icons/shelf.svg" alt="add to shelf" />
-          </div>
-          <div>
+            <div class="absolute"></div>
+          </button>
+          <button
+            title="share book"
+            class="hover:border-[#DDDD] cursor-pointer border border-transparent p-1 flex items-center justify-center"
+          >
             <FontAwesomeIcon class="text-2xl" :icon="faShareFromSquare" />
-          </div>
+          </button>
         </div>
       </div>
       <ul class="ml-4 max-sm:mt-4 max-sm:ml-0">
