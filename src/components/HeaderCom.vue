@@ -1,7 +1,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import SearchbarCom from "./SearchbarCom.vue";
-import { faUser, faBookmark } from "@fortawesome/free-regular-svg-icons";
+import {
+  faUser,
+  faBookmark,
+  faHouse,
+} from "@fortawesome/free-regular-svg-icons";
 import {
   faTrophy,
   faShieldHalved,
@@ -48,6 +52,12 @@ onUnmounted(() => {
         <li
           class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
         >
+          <FontAwesomeIcon :icon="faHouse" />
+          <p>View Profile</p>
+        </li>
+        <li
+          class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
+        >
           <FontAwesomeIcon :icon="faUser" />
           <p>View Profile</p>
         </li>
@@ -63,18 +73,21 @@ onUnmounted(() => {
           <FontAwesomeIcon :icon="faTrophy" />
           <p>Achievements</p>
         </li>
+        <li class="w-full h-0.5 bg-[#dddd]"></li>
         <li
           class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
         >
           <FontAwesomeIcon :icon="faShieldHalved" />
           <p>Premium</p>
         </li>
+
         <li
           class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
         >
           <FontAwesomeIcon :icon="faGears" />
           <p>Settings</p>
         </li>
+        <li class="w-full h-0.5 bg-[#dddd]"></li>
         <li
           class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
         >
