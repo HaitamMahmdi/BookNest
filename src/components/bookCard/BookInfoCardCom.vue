@@ -1,10 +1,11 @@
 <script setup>
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useUserBooks } from "../../stores/userBooks";
 import {
   faShareFromSquare,
   faHeart as faHeartRegular,
+  faPenToSquare,
 } from "@fortawesome/free-regular-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -13,14 +14,57 @@ const props = defineProps({
   isFav: Boolean,
   isInShelf: Boolean,
 });
-const userBooks = useUserBooks();
 const show = ref(true);
+
+const userBooks = useUserBooks();
+const userShelfs = userBooks.shelfs;
+const bookCard = ref(null);
+const shelfs = ref(null);
+const showShelfs = ref(false);
+const addShelf = ref(null);
+const handleClick = (event) => {
+  if (bookCard.value) {
+    if (!showShelfs.value) {
+      document.addEventListener("click", handleClick);
+      showShelfs.value = true;
+      bookCard.value.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      return;
+    }
+    if (
+      showShelfs.value &&
+      !shelfs.value?.contains(event.target) &&
+      !addShelf.value.contains(event.target)
+    ) {
+      showShelfs.value = false;
+      console.log(shelfs.value?.contains(event.target));
+      bookCard.value.style.overflow = "";
+      document.body.style.overflow = "";
+      document.removeEventListener("click", handleClick);
+      showAddNewShelf.value = false;
+    }
+  }
+};
+const showAddNewShelf = ref(false);
+const newShelfName = ref("");
+const addNewShelf = () => {
+  if (newShelfName.value) {
+    userBooks.addNewShelf(newShelfName.value.replace(/\s/g, "_"));
+    newShelfName.value = "";
+    showAddNewShelf.value = false;
+  }
+};
+onUnmounted(() => {
+  document.body.style.overflow = "";
+});
 </script>
 <template>
   <div
+    ref="bookCard"
     v-if="show"
+    style="scrollbar-width: none"
     @click.self="$emit('close')"
-    class="fixed bg-[#000000b5] w-full h-screen max-md:overflow-scroll overscroll-contain left-0 top-0 md:items-end flex justify-center"
+    class="fixed bg-[#000000b5] w-full h-screen overflow-scroll overscroll-contain left-0 top-0 md:items-end flex justify-center"
   >
     <div
       v-if="props.bookInfo"
@@ -57,10 +101,75 @@ const show = ref(true);
           </button>
           <button
             title="add to shelf"
-            class="hover:border-[#DDDD] cursor-pointer border border-transparent p-1 flex items-center justify-center"
+            ref="shelfs"
+            @click="handleClick($event)"
+            class="hover:border-[#DDDD] [425px]:relative cursor-pointer border border-transparent p-1 flex items-center justify-center"
           >
             <img class="w-7" src="/assets/icons/shelf.svg" alt="add to shelf" />
-            <div class="absolute"></div>
+            <div
+              style="scrollbar-width: none"
+              v-if="showShelfs"
+              class="fixed overscroll-contain w-full h-72 shadow-md b rounded-t-4xl overflow-scroll bottom-0 px-4 py-6 z-30 bg-bg-white left-0"
+            >
+              <ul>
+                <li>
+                  <button
+                    @click="showAddNewShelf = !showAddNewShelf"
+                    class="bg-bg-white cursor-pointer group flex items-center border-b border-bg-secondary mb-1 gap-x-4 w-full px-8 py-2.5"
+                  >
+                    <FontAwesomeIcon :icon="faPenToSquare" />
+                    <p class="font-semibold cursor-pointer w-full text-left">
+                      Add New Shelf
+                    </p>
+                  </button>
+                </li>
+                <li
+                  class="bg-bg-white cursor-pointer group flex gap-x-4 w-full px-8 py-2.5"
+                >
+                  <input
+                    type="checkbox"
+                    name="shelf"
+                    id="shelf"
+                    class="cursor-pointer"
+                  />
+                  <label
+                    for="shelf"
+                    class="font-semibold cursor-pointer w-full text-left"
+                    >shelf</label
+                  >
+                </li>
+                <li
+                  @click="
+                    () => {
+                      shelf.books.some((book) => book.id === props.bookInfo.id)
+                        ? userBooks.removeBookFromShelf(
+                            shelf.id,
+                            props.bookInfo.id
+                          )
+                        : userBooks.addBookToShelf(shelf.id, bookInfo);
+                    }
+                  "
+                  v-for="(shelf, index) in userShelfs"
+                  :key="index"
+                  class="bg-bg-white cursor-pointer group flex gap-x-4 w-full px-8 py-2.5"
+                >
+                  <input
+                    type="checkbox"
+                    :checked="
+                      shelf.books.some((book) => book.id === props.bookInfo.id)
+                    "
+                    :name="shelf.name"
+                    :id="shelf.name"
+                    class="cursor-pointer"
+                  />
+                  <label
+                    :for="shelf.name"
+                    class="font-semibold cursor-pointer w-full text-left"
+                    >{{ shelf.name }}</label
+                  >
+                </li>
+              </ul>
+            </div>
           </button>
           <button
             title="share book"
@@ -157,6 +266,29 @@ const show = ref(true);
           </p>
         </li>
       </ul>
+    </div>
+    <div
+      class="w-full h-full absolute flex justify-center items-center left-0 bg-[#000000b5] top-0 z-60"
+      v-show="showAddNewShelf"
+    >
+      <div
+        ref="addShelf"
+        class="bg-bg-white w-full md:w-lg top-3/6 left-0 p-4 rounded-md shadow-md"
+      >
+        <p class="mb-4">New shelf</p>
+        <input
+          v-model="newShelfName"
+          type="text"
+          class="block w-full border border-bg-secondary p-2 rounded-md"
+          placeholder="New shelf name..."
+        />
+        <button
+          @click="addNewShelf"
+          class="px-4 py-1 border w-full border-bg-main rounded-md mt-4 bg-bg-secondary text-bg-white"
+        >
+          save
+        </button>
+      </div>
     </div>
   </div>
 </template>
