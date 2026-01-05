@@ -16,72 +16,17 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 const showDropdown = ref(false);
 const profile = ref(null);
 const handleClick = (e) => {
-  console.log(e.target);
   if (!showDropdown.value) {
     showDropdown.value = true;
     document.addEventListener("click", handleClick);
     return;
   }
-  console.log(e.target);
   if (!profile.value?.contains(e?.target)) {
     console.log(profile.value?.contains(e?.target));
     showDropdown.value = false;
     document.removeEventListener("click", handleClick);
   }
 };
-/**    <ul
-      v-show="showDropdown"
-      class="absolute w-full sm:hidden bg-[#354445] z-50 text-text-main top-full"
-    >
-      <li class="flex items-center justify-center py-4">
-        <SearchbarCom></SearchbarCom>
-      </li>
-      <li
-        class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
-      >
-        <FontAwesomeIcon :icon="faHouse" />
-        <p>View Profile</p>
-      </li>
-      <li
-        class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
-      >
-        <FontAwesomeIcon :icon="faUser" />
-        <p>View Profile</p>
-      </li>
-      <li
-        class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
-      >
-        <FontAwesomeIcon :icon="faBookmark" />
-        <p>Your Shelfs</p>
-      </li>
-      <li
-        class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
-      >
-        <FontAwesomeIcon :icon="faTrophy" />
-        <p>Achievements</p>
-      </li>
-      <li class="w-full h-0.5 bg-[#dddd]"></li>
-      <li
-        class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
-      >
-        <FontAwesomeIcon :icon="faShieldHalved" />
-        <p>Premium</p>
-      </li>
-
-      <li
-        class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
-      >
-        <FontAwesomeIcon :icon="faGears" />
-        <p>Settings</p>
-      </li>
-      <li class="w-full h-0.5 bg-[#dddd]"></li>
-      <li
-        class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
-      >
-        <FontAwesomeIcon :icon="faInfo" />
-        <p>Help</p>
-      </li>
-    </ul> */
 </script>
 <template>
   <header
