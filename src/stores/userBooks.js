@@ -7,6 +7,10 @@ import {
   arrayUnion,
   onSnapshot,
 } from "firebase/firestore";
+const authStore = useUserAuth();
+const user = authStore.user;
+const db = getFirestore();
+const userRef = doc(db, `users`, user.uid);
 export const useUserBooks = defineStore(`userBooks`, {
   state: () => ({
     favorites: null,
@@ -16,35 +20,25 @@ export const useUserBooks = defineStore(`userBooks`, {
   }),
   actions: {
     async addToFavorites(book) {
-      const authStore = useUserAuth();
-      const user = authStore.user;
       if (!user) {
         return;
       }
-      const db = getFirestore();
+
       const userRef = doc(db, `users`, user.uid);
       await updateDoc(userRef, {
         favorites: arrayUnion(book),
       });
     },
     async removeFromFavorites(bookId) {
-      const authStore = useUserAuth();
-      const user = authStore.user;
-      if (!user && !this.favorites) {
+      if (!user) {
         return;
       }
       this.favorites = this.favorites.filter((book) => book.id !== bookId);
-      const db = getFirestore();
-      const userRef = doc(db, `users`, user.uid);
       await updateDoc(userRef, {
         favorites: this.favorites,
       });
     },
     async loadUserBooks() {
-      const authStore = useUserAuth();
-      const user = authStore.user;
-      const db = getFirestore();
-      const userRef = doc(db, `users`, user.uid);
       if (this.unsubscribe) {
         this.unsubscribe();
       }
@@ -57,10 +51,40 @@ export const useUserBooks = defineStore(`userBooks`, {
         }
       });
     },
-    stopUserListener() {
-      if (this.unsubscribe) {
-        this.unsubscribe();
-        this.unsubscribe = null;
+    createShelfs(shelfs) {
+      this.shelfs = shelfs;
+    },
+    async addNewShelf(shelfName) {
+      if (!user) {
+        return;
+      }
+      this.shelfs.push({ name: shelfName, books: [], id: crypto.randomUUID() });
+      await updateDoc(userRef, {
+        shelfs: this.shelfs,
+      });
+    },
+    async addBookToShelf(shelfID, book) {
+      if (!user) {
+        return;
+      }
+      const shelf = this.shelfs.find((s) => s.id === shelfID);
+      if (shelf) {
+        shelf.books.push(book);
+        await updateDoc(userRef, {
+          shelfs: this.shelfs,
+        });
+      }
+    },
+    async removeBookFromShelf(shelfID, bookId) {
+      if (!user) {
+        return;
+      }
+      const shelf = this.shelfs.find((s) => s.id === shelfID);
+      if (shelf) {
+        shelf.books = shelf.books.filter((book) => book.id !== bookId);
+        await updateDoc(userRef, {
+          shelfs: this.shelfs,
+        });
       }
     },
   },
