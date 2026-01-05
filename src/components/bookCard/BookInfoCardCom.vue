@@ -1,5 +1,5 @@
 <script setup>
-import { onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useUserBooks } from "../../stores/userBooks";
 import {
@@ -28,7 +28,6 @@ const handleClick = (event) => {
       document.addEventListener("click", handleClick);
       showShelfs.value = true;
       bookCard.value.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
       return;
     }
     if (
@@ -54,33 +53,44 @@ const addNewShelf = () => {
     showAddNewShelf.value = false;
   }
 };
+onMounted(() => {
+  document.body.style.overflow = "hidden";
+});
 onUnmounted(() => {
   document.body.style.overflow = "";
 });
 </script>
 <template>
   <div
-    ref="bookCard"
     v-if="show"
     style="scrollbar-width: none"
     @click.self="$emit('close')"
-    class="fixed bg-[#000000b5] w-full h-screen overflow-scroll overscroll-contain left-0 top-0 md:items-end flex justify-center"
+    class="fixed bg-shdowOverlay w-full h-screen left-0 top-0 md:items-end"
   >
     <div
+      ref="bookCard"
       v-if="props.bookInfo"
       :id="props.bookInfo.id"
-      class="bg-bg-white flex h-fit max-sm:flex-wrap max-sm:justify-center max-sm:text-center p-4 rounded-t-2xl pt-8 max-md:top-[166px] max-sm:px-0 relative w-full"
+      style="scrollbar-width: none"
+      class="bg-bg-white bottom-0 flex max-h-4/5 max-sm:flex-wrap overflow-scroll max-sm:justify-center max-sm:text-center p-4 rounded-t-2xl pt-8 max-sm:px-0 absolute w-full"
     >
       <div
-        class="min-w-40 sm:border-r border-[#ddd] pr-4 max-sm:px-0 flex flex-col justify-between"
+        class="min-w-40 sm:border-r border-[#ddd] pr-4 max-sm:px-0 flex flex-col"
       >
         <div>
           <img
             draggable="false"
-            class="w-40 h-64 mb-4"
+            class="w-40 h-64 mb-4 mx-auto"
             :src="props.bookInfo.volumeInfo.imageLinks?.thumbnail"
             :alt="props.bookInfo.volumeInfo.title"
           />
+        </div>
+        <div class="mb-3">
+          <button
+            class="text-2xl cursor-pointer font-semibold text-text-main bg-bg-tertiary px-4 py-2 rounded-md"
+          >
+            Start Reading
+          </button>
         </div>
         <div class="flex flex-wrap items-center justify-between">
           <button
@@ -182,7 +192,7 @@ onUnmounted(() => {
       <ul class="ml-4 max-sm:mt-4 max-sm:ml-0">
         <li>
           <h2 class="font-bold text-textLg">Title :</h2>
-          <h2 class="font-bold ml-2">
+          <h2 class="font-semibold text-lg ml-2">
             {{ props.bookInfo.volumeInfo.title }}
           </h2>
         </li>
@@ -192,6 +202,16 @@ onUnmounted(() => {
           <p class="max-w-3xl ml-2 max-sm:ml-0">
             {{
               props.bookInfo.volumeInfo.subtitle ||
+              " Lorem ipsum dolor sit amet consectetur adipisicing elre vel error inventore nobis,  totam aspernatur expedita, magnam nihils."
+            }}
+          </p>
+        </li>
+
+        <li class="mt-5">
+          <p class="font-bold text-textLg">description :</p>
+          <p class="max-w-3xl ml-2 max-sm:ml-0">
+            {{
+              props.bookInfo.volumeInfo?.description ||
               " Lorem ipsum dolor sit amet consectetur adipisicing elre vel error inventore nobis,  totam aspernatur expedita, magnam nihil facilis minus natus vero asperiores."
             }}
           </p>
@@ -268,7 +288,7 @@ onUnmounted(() => {
       </ul>
     </div>
     <div
-      class="w-full h-full absolute flex justify-center items-center left-0 bg-[#000000b5] top-0 z-60"
+      class="w-full h-full absolute flex justify-center items-center left-0 bg-shdowOverlay top-0 z-60"
       v-show="showAddNewShelf"
     >
       <div
