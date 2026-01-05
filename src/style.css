@@ -37,6 +37,7 @@
   --color-error: #cc0000;
   --color-star: #ffd700;
   --text-textLg: 18px;
+  --shadow-md: 1px -20px 20px 11px #00000033;
   --breakpoint-1xl: 90rem;
   --animate-float: float 3.7s ease-in-out infinite backwards;
   --animate-float2: float2 3s ease-in-out infinite backwards;
