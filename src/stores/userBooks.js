@@ -13,9 +13,9 @@ const db = getFirestore();
 const userRef = doc(db, `users`, user.uid);
 export const useUserBooks = defineStore(`userBooks`, {
   state: () => ({
-    favorites: null,
-    shelfs: null,
-    reading: null,
+    favorites: [],
+    shelfs: [],
+    reading: [],
     unsubscribe: null,
   }),
   actions: {
@@ -23,7 +23,6 @@ export const useUserBooks = defineStore(`userBooks`, {
       if (!user) {
         return;
       }
-
       const userRef = doc(db, `users`, user.uid);
       await updateDoc(userRef, {
         favorites: arrayUnion(book),
@@ -51,8 +50,17 @@ export const useUserBooks = defineStore(`userBooks`, {
         }
       });
     },
-    createShelfs(shelfs) {
-      this.shelfs = shelfs;
+    stopUserBooksListener() {
+      if (this.unsubscribe) {
+        this.unsubscribe();
+        this.unsubscribe = null;
+      }
+    },
+    async createShelfs(shelfName) {
+      this.shelfs.push({ name: shelfName, books: [], id: crypto.randomUUID() });
+      await updateDoc(userRef, {
+        shelfs: this.shelfs,
+      });
     },
     async addNewShelf(shelfName) {
       if (!user) {
@@ -68,11 +76,34 @@ export const useUserBooks = defineStore(`userBooks`, {
         return;
       }
       const shelf = this.shelfs.find((s) => s.id === shelfID);
+      const isIn = this.isInShelf(shelfID, book.id);
+      if (isIn) {
+        return;
+      }
       if (shelf) {
         shelf.books.push(book);
         await updateDoc(userRef, {
           shelfs: this.shelfs,
         });
+      }
+    },
+    isInShelf(shelfID, bookId) {
+      if (shelfID && bookId) {
+        const shelf = this.shelfs.find((s) => s.id === shelfID);
+        if (shelf) {
+          return shelf.books.some((book) => book.id === bookId);
+        }
+      } else if (!shelfID && bookId) {
+        console.log(`sss`);
+        for (let shelf of this.shelfs) {
+          for (let book of shelf.books) {
+            console.log(book.id, bookId);
+            if (book.id === bookId) {
+              console.log(book.id);
+              return true;
+            }
+          }
+        }
       }
     },
     async removeBookFromShelf(shelfID, bookId) {
@@ -82,6 +113,12 @@ export const useUserBooks = defineStore(`userBooks`, {
       const shelf = this.shelfs.find((s) => s.id === shelfID);
       if (shelf) {
         shelf.books = shelf.books.filter((book) => book.id !== bookId);
+        for (let i = 0; i < this.shelfs.length; i++) {
+          if (this.shelfs[i].id === shelfID) {
+            this.shelfs[i] = shelf;
+            break;
+          }
+        }
         await updateDoc(userRef, {
           shelfs: this.shelfs,
         });
