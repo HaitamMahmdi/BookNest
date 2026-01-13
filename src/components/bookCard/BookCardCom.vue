@@ -3,7 +3,6 @@ const props = defineProps({
   bookObj: Object,
 });
 const bookObj = props.bookObj;
-console.log(bookObj);
 </script>
 <template>
   <div
