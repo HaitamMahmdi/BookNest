@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import BookCardCom from "../components/bookCard/BookCardCom.vue";
 import BookInfoCardCom from "../components/bookCard/BookInfoCardCom.vue";
 import { faDragon, faRobot, faGhost, faLandmark } from "@fortawesome/free-solid-svg-icons";
@@ -46,6 +46,9 @@ userBooks.loadUserBooks();
 })();
 const fillteredBooks = ref(null);
 const bookDetail = ref(null);
+onUnmounted(() => {
+  userBooks.stopUserBooksListener();
+});
 </script>
 <template>
   <div>

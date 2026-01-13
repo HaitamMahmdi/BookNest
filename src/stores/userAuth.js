@@ -39,7 +39,13 @@ export const useUserAuth = defineStore(`userAuth`, {
         await setDoc(doc(colRef, userCredential.user.uid), {
           createdAt: new Date(),
           favorites: [],
-          shelfs: [],
+          shelfs: [
+            {
+              name: "default",
+              books: [],
+              id: crypto.randomUUID(),
+            },
+          ],
           reading: [],
         });
 
