@@ -62,7 +62,6 @@ const inputs = reactive({
     validatePassword() {
       const regx =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      console.log(regx.test(this.text));
       if (!regx.test(this.text)) {
         this.isValid = false;
       }
@@ -85,7 +84,7 @@ function scrollToLeft() {
     rightButton.value.classList.remove(`active`);
 
     features.value.scrollTo({
-      left: features.value.scrollLeft + 50,
+      left: features.value.scrollLeft + 500,
       behavior: "smooth",
     });
     requestAnimationFrame(scrollToLeft);
@@ -97,7 +96,7 @@ function scrollToRight() {
     leftButton.value.classList.remove(`active`);
     rightButton.value.classList.add(`active`);
     features.value.scrollTo({
-      left: features.value.scrollLeft - 50,
+      left: features.value.scrollLeft - 500,
       behavior: "smooth",
     });
     requestAnimationFrame(scrollToRight);
@@ -430,7 +429,7 @@ function reset() {
             <button
               @click="scrollToRight"
               ref="rightButton"
-              class="w-2.5 cursor-pointer transition aspect-square mr-2.5 rounded-full bg-white"
+              class="w-2.5 cursor-pointer transition aspect-square mr-2.5 rounded-full bg-white active"
             ></button>
             <button
               @click="scrollToLeft"
