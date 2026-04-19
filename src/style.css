@@ -39,7 +39,9 @@
   --color-star: #ffd700;
   --text-textLg: 18px;
   --shadow-md: 1px -20px 20px 11px #00000033;
+  --shadow-max: 0px 0px 9000px 9000px #00000094;
   --breakpoint-1xl: 90rem;
+  --breakpoint-xs: 425px;
   --animate-float: float 3.7s ease-in-out infinite backwards;
   --animate-float2: float2 3s ease-in-out infinite backwards;
   --animate-inOut: inOut 6s ease-in-out infinite;
@@ -96,4 +98,7 @@
 
 html {
   scroll-behavior: smooth;
+}
+button {
+  outline: none;
 }

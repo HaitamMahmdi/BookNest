@@ -13,9 +13,9 @@ const routes = [
     },
   },
   {
-    path: "/Books",
-    name: "Books",
-    component: () => import("../views/Books.vue"),
+    path: "/Book/:id",
+    name: "Book",
+    component: () => import("../views/BookView.vue"),
     meta: {
       requiresAuth: true,
     },
