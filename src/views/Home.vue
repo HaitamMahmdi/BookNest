@@ -1,13 +1,11 @@
 <script setup>
 import { onUnmounted, ref } from "vue";
-import BookCardCom from "../components/bookCard/BookCardCom.vue";
-import BookInfoCardCom from "../components/bookCard/BookInfoCardCom.vue";
+import BookCardCom from "@/components/BookCard/BookCardCom.vue";
 import { faDragon, faRobot, faGhost, faLandmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useUserBooks } from "../stores/userBooks";
  const userBooks = useUserBooks();
 const books = ref({});
-userBooks.loadUserBooks();
 (async () => {
   const resp = await fetch(
     `https://www.googleapis.com/books/v1/volumes?q=subject:fantasy&orderBy=newest&langRestrict=en&maxResults=40`
@@ -46,9 +44,6 @@ userBooks.loadUserBooks();
 })();
 const fillteredBooks = ref(null);
 const bookDetail = ref(null);
-onUnmounted(() => {
-  userBooks.stopUserBooksListener();
-});
 </script>
 <template>
   <div>
@@ -64,7 +59,7 @@ onUnmounted(() => {
           v-if="books && (!fillteredBooks || fillteredBooks === 'fantasy')"
           v-for="book in books.fantasy"
           :key="book.id"
-          :book-obj="book"
+          :book="book"
           @showInfos="(bookObj) => (bookDetail = bookObj)"
         >
         </BookCardCom>
@@ -72,7 +67,7 @@ onUnmounted(() => {
           v-if="books && (!fillteredBooks || fillteredBooks === 'science_fiction')"
           v-for="book in books.science_fiction"
           :key="book.id"
-          :book-obj="book"
+          :book="book"
           @showInfos="(bookObj) => (bookDetail = bookObj)"
         >
         </BookCardCom>
@@ -80,7 +75,7 @@ onUnmounted(() => {
           v-if="books && (!fillteredBooks || fillteredBooks === 'mystery')"
           v-for="book in books.mystery"
           :key="book.id"
-          :book-obj="book"
+          :book="book"
           @showInfos="(bookObj) => (bookDetail = bookObj)"
         >
         </BookCardCom>
@@ -88,7 +83,7 @@ onUnmounted(() => {
             v-if="books && (!fillteredBooks || fillteredBooks === 'history')"
             v-for="book in books.history"
             :key="book.id"
-            :book-obj="book"
+            :book="book"
             @showInfos="(bookObj) => (bookDetail = bookObj)"
              </BookCardCom>
       </div>
