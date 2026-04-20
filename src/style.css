@@ -95,7 +95,9 @@
     }
   }
 }
-
+* {
+  text-transform: capitalize;
+}
 html {
   scroll-behavior: smooth;
 }
