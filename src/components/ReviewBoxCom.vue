@@ -12,6 +12,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
   obj: Object,
+  class: String,
 });
 
 const isVisible = ref(false);
@@ -38,6 +39,7 @@ onUnmounted(() => {
 <template>
   <article
     ref="articleRef"
+    :class="class"
     class="bg-bg-secondary max-w-2xl px-4 py-4 rounded-lg relative text-white"
   >
     <div class="flex items-center gap-x-1 relative pb-1 border-b border-white">

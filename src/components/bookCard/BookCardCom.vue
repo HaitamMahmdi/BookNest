@@ -14,6 +14,7 @@ import AddNewShelfCom from "./AddNewShelfCom.vue";
 const userBooks = useUserBooks();
 const props = defineProps({
   book: Object,
+  class: String,
 });
 const emit = defineEmits(["showInfos"]);
 const isFavorite = computed(() => {
@@ -30,6 +31,7 @@ const showAddNewShelfCom = ref(false);
 </script>
 <template>
   <article
+    :class="[props.class]"
     class="w-45 bg-bg-secondary flex flex-col justify-between px-2 py-4 rounded-lg relative text-white max-h-105"
   >
     <div class="header">
@@ -47,8 +49,8 @@ const showAddNewShelfCom = ref(false);
           :title="props.book?.volumeInfo.title"
         >
           {{
-            props.book?.volumeInfo.title.length > 40
-              ? props.book.volumeInfo.title.slice(0, 40) + "..."
+            props.book?.volumeInfo.title.length > 20
+              ? props.book.volumeInfo.title.slice(0, 20) + "..."
               : props.book?.volumeInfo.title
           }}
         </p>
