@@ -7,6 +7,8 @@ export const useUserBooks = defineStore(`userBooks`, {
     favorites: [],
     shelfs: [],
     reading: [],
+    reviews: [],
+    finishedBooks: [],
     unsubscribe: null,
   }),
   getters: {
@@ -32,6 +34,9 @@ export const useUserBooks = defineStore(`userBooks`, {
           }
         }
       }
+    },
+    isFinisedBook: (state) => (bookID) => {
+      return state.finishedBooks.some((id) => id === bookID);
     },
   },
   actions: {
@@ -85,6 +90,7 @@ export const useUserBooks = defineStore(`userBooks`, {
           this.favorites = data.favorites;
           this.shelfs = data.shelfs;
           this.reading = data.reading;
+          this.reviews = data.reviews || [];
         }
       });
     },
@@ -140,7 +146,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         return;
       }
       const shelf = this.shelfs.find((s) => s.id === shelfID);
-      const isIn = this.isInShelf(shelfID, book.id);
+      const isIn = this.isInShelfGetter(shelfID, book.id);
       if (isIn) {
         return;
       }
@@ -177,6 +183,156 @@ export const useUserBooks = defineStore(`userBooks`, {
           shelfs: this.shelfs,
         });
       }
+    },
+    /**
+     * add a review to a book .
+     * @param {string} bookID - The ID of the book to add the review to
+     * @param {object} review - an object that contains (title, body, rating, date) of the review
+     * @returns {Promise<void>} - Resolves when the update is complete.
+     */
+    async addNewReview(bookID, review) {
+      const authStore = useUserAuth();
+      if (!authStore.user || typeof review !== "object") {
+        return;
+      }
+      const userRef = doc(db, `users`, authStore.user.uid);
+
+      review.id = crypto.randomUUID();
+      review.bookID = bookID;
+      await updateDoc(userRef, {
+        reviews: arrayUnion(review),
+      });
+    },
+
+    /**
+     * remove a review from the user's reviews list.
+     * @param {string} reviewID - The ID of the review to remove
+     * @returns {Promise<void>} - Resolves when the update is complete.
+     */
+    async removeReview(reviewID) {
+      const authStore = useUserAuth();
+      if (!authStore.user) {
+        return;
+      }
+      this.reviews = this.reviews.filter((review) => review.id !== reviewID);
+      const userRef = doc(db, `users`, authStore.user.uid);
+      await updateDoc(userRef, {
+        reviews: this.reviews,
+      });
+    },
+
+    /**
+     * update reading progress or add a new progress entry for a book.
+     * @param {string} bookID - The ID of the book
+     * @param {object} progObj - object containing (progrees, thought)
+     * @returns {Promise<void>} - Resolves when the update is complete.
+     */
+    async updateProgrees(bookID, progObj) {
+      const authStore = useUserAuth();
+      if (!authStore.user) {
+        return;
+      }
+      const userRef = doc(db, `users`, authStore.user.uid);
+
+      let book;
+      for (const read of this.reading) {
+        if (read.id === bookID) {
+          book = read;
+        }
+      }
+
+      const date = new Date();
+
+      if (book) {
+        book.reading.push({
+          id: crypto.randomUUID(),
+          progrees: progObj.progrees,
+          thought: progObj.thought,
+          date: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`, // fixed getDay -> getDate
+        });
+      } else {
+        this.reading.push({
+          id: bookID,
+          reading: [
+            {
+              id: crypto.randomUUID(),
+              progrees: progObj.progrees,
+              thought: progObj.thought,
+              date: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
+            },
+          ],
+        });
+      }
+
+      await updateDoc(userRef, {
+        reading: this.reading,
+      });
+    },
+
+    /**
+     * delete a specific thought (progress entry) from a book.
+     * @param {string} bookID - The ID of the book
+     * @param {string} thoughtID - The ID of the thought to delete
+     * @returns {Promise<void>} - Resolves when the update is complete.
+     */
+    async deleteThought(bookID, thoughtID) {
+      const authStore = useUserAuth();
+      if (!authStore.user) {
+        return;
+      }
+      const userRef = doc(db, `users`, authStore.user.uid);
+
+      this.reading = this.reading.map((book) => {
+        if (book.id !== bookID) return book;
+        return {
+          ...book,
+          reading: book.reading.filter((thought) => thought.id !== thoughtID),
+        };
+      });
+
+      await updateDoc(userRef, {
+        reading: this.reading,
+      });
+    },
+
+    /**
+     * add a book to the finished books list.
+     * @param {string} bookID - The ID of the book to add
+     * @returns {Promise<void>} - Resolves when the update is complete.
+     */
+    async addToFinishedBooks(bookID) {
+      const authStore = useUserAuth();
+      if (!authStore.user) {
+        return;
+      }
+      const userRef = doc(db, `users`, authStore.user.uid);
+
+      this.finishedBooks.push(bookID);
+
+      await updateDoc(userRef, {
+        finishedBooks: this.finishedBooks,
+      });
+    },
+
+    /**
+     * remove a book from the finished books list.
+     * @param {string} bookID - The ID of the book to remove
+     * @returns {Promise<void>} - Resolves when the update is complete.
+     */
+    async deleteFinishedBook(bookID) {
+      const authStore = useUserAuth();
+      if (!authStore.user) {
+        return;
+      }
+      const userRef = doc(db, `users`, authStore.user.uid);
+
+      this.finishedBooks = this.finishedBooks.filter(
+        (book) => book !== bookID, // fixed missing return
+      );
+
+      await updateDoc(userRef, {
+        finishedBooks: this.finishedBooks,
+      });
     },
   },
 });

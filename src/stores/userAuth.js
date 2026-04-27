@@ -26,7 +26,7 @@ export const useUserAuth = defineStore(`userAuth`, {
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
-          password
+          password,
         );
         this.user = auth.currentUser;
         const actionCodeSettings = {
@@ -47,6 +47,8 @@ export const useUserAuth = defineStore(`userAuth`, {
             },
           ],
           reading: [],
+          finishedBooks: [],
+          reviews: [],
         });
 
         console.log("User document created in Firestore");
