@@ -7,17 +7,21 @@ import {
   faEllipsisVertical,
   faBullhorn,
   faEyeSlash,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { ref, onMounted, onUnmounted } from "vue";
+import { useUserBooks } from "../stores/userBooks";
 
 const props = defineProps({
   obj: Object,
   class: String,
+  isUserReview: Boolean,
+  reviewID: String,
 });
 
 const isVisible = ref(false);
 const articleRef = ref(null);
-
+const userBooks = useUserBooks();
 const toggleOptions = () => {
   isVisible.value = !isVisible.value;
 };
@@ -35,12 +39,14 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
 });
+const hide = ref(false);
 </script>
 <template>
   <article
+    v-if="!hide"
     ref="articleRef"
     :class="class"
-    class="bg-bg-secondary max-w-2xl px-4 py-4 rounded-lg relative text-white"
+    class="bg-bg-secondary flex flex-col min-h-50 max-w-2xl px-4 py-4 rounded-lg relative text-white"
   >
     <div class="flex items-center gap-x-1 relative pb-1 border-b border-white">
       <img
@@ -69,24 +75,32 @@ onUnmounted(() => {
         class="absolute right-2 top-10 bg-bg-main rounded-md shadow-lg p-2"
       >
         <button
+          v-if="!isUserReview"
           class="flex items-center gap-x-1 cursor-pointer text-error py-1 px-4 rounded-md hover:bg-error/20"
         >
           <FontAwesomeIcon :icon="faBullhorn" />
           <span>Report</span>
         </button>
         <button
+          @click="hide = true"
+          v-if="!isUserReview"
           class="flex w-full items-center gap-x-1 cursor-pointer text-gray-400 py-1 px-4 rounded-md hover:bg-gray-400/20"
         >
           <FontAwesomeIcon :icon="faEyeSlash" />
           <span>Hide</span>
         </button>
+        <button
+          @click="userBooks.removeReview(props.reviewID)"
+          v-if="isUserReview"
+          class="flex w-full items-center gap-x-1 cursor-pointer text-error py-1 px-4 rounded-md hover:bg-error/20"
+        >
+          <FontAwesomeIcon :icon="faTrash" />
+          <span>delete</span>
+        </button>
       </div>
     </div>
-    <p class="mt-2">
-      Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt earum
-      quibusdam esse recusandae id minus repudiandae, magni modi obcaecati
-      animi, fuga alias. Voluptas impedit accusamus eos in dolore excepturi
-      consequuntur!
+    <p class="mt-2 grow">
+      {{ obj.review }}
     </p>
     <div class="mt-4 flex items-center justify-between">
       <p>{{ obj.reviewDate }}</p>
