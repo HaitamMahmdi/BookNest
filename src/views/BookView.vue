@@ -116,7 +116,7 @@ const showAddNewShelfCom = ref(false)
       <article class="grid grid-cols-[1fr_2fr] max-md:grid-cols-1">
         <div class="px-4 relative max-md:flex flex-wrap max-md:justify-center gap-x-4 max-md:mb-10">
           <OptionsCom :show-delete="false" :show-edit="false"
-            :container-class="`absolute top-4  flex items-center justify-center rounded-full right-8`"
+            :container-class="`absolute! top-4  flex items-center justify-center rounded-full right-8`"
             :showFinish="false" :showHide="false"
             button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
             :options-list-style="`right-0`">

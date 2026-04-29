@@ -40,7 +40,7 @@ const showAddNewShelfCom = ref(false);
             '/assets/backGrounds/authBackGround.svg'
             " :alt="props.book?.volumeInfo.title" />
           <OptionsCom :show-delete="false" :show-edit="false"
-            :container-class="`absolute top-2  flex items-center justify-center rounded-full right-2`"
+            :container-class="`absolute! top-2  flex items-center justify-center rounded-full right-2`"
             button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
             :options-list-style="`right-0`" :book="props.book" @report="$emit('showInfos')">
 
