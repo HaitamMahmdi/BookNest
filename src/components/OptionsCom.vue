@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useUserBooks } from '../stores/userBooks';
 import { useScrollLock } from "../composables/useScrollControl";
 import { useClickOutside } from "@/composables/useClickOutside";
@@ -54,9 +54,13 @@ useClickOutside(optionsRef, () => {
     console.log('clicked outside');
     if (showOptions.value) closeModal()
 });
+const clickOption = (option) => {
+    emit(option)
+    closeModal()
+}
 </script>
 <template>
-    <div :class="props.containerClass" class="w-fit">
+    <div :class="props.containerClass" class="w-fit relative">
         <button :class="props.buttonClass" id="part" @click="toggleOptions"
             class=" text-gray-400  hover:text-white focus:text-text-main cursor-pointer">
             <FontAwesomeIcon id="part" :icon="faEllipsisVertical" />
@@ -64,32 +68,32 @@ useClickOutside(optionsRef, () => {
         <div :class="props.optionsListStyle" class="w-30 absolute top-full mt-2 bg-Shark  shadow-lg z-10"
             v-if="showOptions" ref="optionsRef">
 
-            <button v-if="props.showShare" @click="emit('share')"
+            <button v-if="props.showShare" @click="clickOption('share')"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-warning py-1 px-2  transition-all hover:pl-4 hover:bg-warning/20">
                 <FontAwesomeIcon :icon="faShare" />
                 <span>Share</span>
             </button>
-            <button v-if="props.showFinish" @click="emit('finish')"
+            <button v-if="props.showFinish" @click="clickOption('finish')"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-success py-1 px-2  transition-all hover:pl-4 hover:bg-successbg/20">
                 <FontAwesomeIcon :icon="faCheck" />
                 <span>finished</span>
             </button>
-            <button v-if="props.showEdit" @click="emit('edit')"
+            <button v-if="props.showEdit" @click="clickOption('edit')"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-text-main py-1 px-2  transition-all hover:pl-4 hover:bg-[#DBEAFE]/20">
                 <FontAwesomeIcon :icon="faPenToSquare" />
                 <span>edit</span>
             </button>
-            <button v-if="props.showHide" @click="emit('hide')"
+            <button v-if="props.showHide" @click="clickOption('hide')"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-text-main py-1 px-2  transition-all hover:pl-4 hover:bg-gray-400/20">
                 <FontAwesomeIcon :icon="faEyeSlash" />
                 <span>Hide</span>
             </button>
-            <button v-if="props.showReport" @click="emit('report')"
+            <button v-if="props.showReport" @click="clickOption('report')"
                 class="flex items-center w-full gap-x-1 cursor-pointer text-error py-1 px-2  transition-all hover:pl-4 hover:bg-error/20">
                 <FontAwesomeIcon :icon="faBullhorn" />
                 <span>Report</span>
             </button>
-            <button @click="emit('delete')" v-if="props.showDelete"
+            <button @click="clickOption('delete')" v-if="props.showDelete"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-error py-1 px-2  transition-all hover:pl-4 hover:bg-error/20">
                 <FontAwesomeIcon :icon="faTrash" />
                 <span>delete</span>

@@ -11,6 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { ref, onMounted, onUnmounted } from "vue";
 import { useUserBooks } from "../stores/userBooks";
+import OptionsCom from "./OptionsCom.vue";
 
 const props = defineProps({
   obj: Object,
@@ -19,85 +20,25 @@ const props = defineProps({
   reviewID: String,
 });
 
-const isVisible = ref(false);
-const articleRef = ref(null);
+
 const userBooks = useUserBooks();
-const toggleOptions = () => {
-  isVisible.value = !isVisible.value;
-};
 
-const handleClickOutside = (event) => {
-  if (articleRef.value && !articleRef.value.contains(event.target)) {
-    isVisible.value = false;
-  }
-};
-
-onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("click", handleClickOutside);
-});
 const hide = ref(false);
 </script>
 <template>
-  <article
-    v-if="!hide"
-    ref="articleRef"
-    :class="class"
-    class="bg-bg-secondary flex flex-col min-h-50 max-w-2xl px-4 py-4 rounded-lg relative text-white"
-  >
+  <article v-if="!hide" ref="articleRef" :class="class"
+    class="bg-bg-secondary flex flex-col min-h-50 max-w-2xl px-4 py-4 rounded-lg relative text-white">
     <div class="flex items-center gap-x-1 relative pb-1 border-b border-white">
-      <img
-        :src="obj.profileImg"
-        :alt="obj.name"
-        class="w-10 h-10 rounded-full"
-      />
-      <div>
+      <img :src="obj.profileImg" :alt="obj.name" class="w-10 h-10 rounded-full" />
+      <div class="grow">
         <p class="ml-2 font-semibold text-sm">{{ obj.name }}</p>
 
-        <FontAwesomeIcon
-          class="text-star text-sm"
-          v-for="star in Number.isInteger(obj.rating) ? obj.rating : 3 || 2"
-          :key="star"
-          :icon="faStar"
-        />
+        <FontAwesomeIcon class="text-star text-sm" v-for="star in Number.isInteger(obj.rating) ? obj.rating : 3 || 2"
+          :key="star" :icon="faStar" />
       </div>
-      <button
-        @click="toggleOptions"
-        class="absolute right-2 top-2 text-gray-400 hover:text-white cursor-pointer"
-      >
-        <FontAwesomeIcon :icon="faEllipsisVertical" />
-      </button>
-      <div
-        v-show="isVisible"
-        class="absolute right-2 top-10 bg-bg-main rounded-md shadow-lg p-2"
-      >
-        <button
-          v-if="!isUserReview"
-          class="flex items-center gap-x-1 cursor-pointer text-error py-1 px-4 rounded-md hover:bg-error/20"
-        >
-          <FontAwesomeIcon :icon="faBullhorn" />
-          <span>Report</span>
-        </button>
-        <button
-          @click="hide = true"
-          v-if="!isUserReview"
-          class="flex w-full items-center gap-x-1 cursor-pointer text-gray-400 py-1 px-4 rounded-md hover:bg-gray-400/20"
-        >
-          <FontAwesomeIcon :icon="faEyeSlash" />
-          <span>Hide</span>
-        </button>
-        <button
-          @click="userBooks.removeReview(props.reviewID)"
-          v-if="isUserReview"
-          class="flex w-full items-center gap-x-1 cursor-pointer text-error py-1 px-4 rounded-md hover:bg-error/20"
-        >
-          <FontAwesomeIcon :icon="faTrash" />
-          <span>delete</span>
-        </button>
-      </div>
+      <OptionsCom :options-list-style="`right-0 top-3/6!`" :show-delete="props.isUserReview"
+        :show-edit="props.isUserReview" :show-finish="false" :show-report="!props.isUserReview"
+        @hide="() => hide = true"></OptionsCom>
     </div>
     <p class="mt-2 grow">
       {{ obj.review }}
