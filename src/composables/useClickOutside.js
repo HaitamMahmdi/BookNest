@@ -36,7 +36,8 @@ export function useClickOutside(targetRef, callback) {
   const handler = (e) => {
     if (!targetRef.value) return;
     const el = targetRef.value?.$el || targetRef.value;
-    if (!el.contains(e.target) && e.target.id !== "part") {
+    const parent = el.parentElement;
+    if (!parent.contains(e.target)) {
       callback(e);
     }
   };

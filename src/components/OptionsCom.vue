@@ -6,6 +6,9 @@ import { useClickOutside } from "@/composables/useClickOutside";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faBullhorn, faEyeSlash, faTrash, faShare, faCheck, faPenToSquare, faEllipsisVertical } from '@fortawesome/free-solid-svg-icons';
 const props = defineProps({
+    containerClass: String,
+    buttonClass: String,
+    optionsListStyle: String,
     showReport: {
         type: Boolean,
         default: true,
@@ -53,11 +56,13 @@ useClickOutside(optionsRef, () => {
 });
 </script>
 <template>
-    <div class="relative w-fit" id="part">
-        <button id="part" @click="toggleOptions" class=" text-gray-400  hover:text-white cursor-pointer">
+    <div :class="props.containerClass" class="w-fit">
+        <button :class="props.buttonClass" id="part" @click="toggleOptions"
+            class=" text-gray-400  hover:text-white focus:text-text-main cursor-pointer">
             <FontAwesomeIcon id="part" :icon="faEllipsisVertical" />
         </button>
-        <div class="w-30 absolute left-0 top-full mt-2 bg-Shark  shadow-lg z-10" v-if="showOptions" ref="optionsRef">
+        <div :class="props.optionsListStyle" class="w-30 absolute top-full mt-2 bg-Shark  shadow-lg z-10"
+            v-if="showOptions" ref="optionsRef">
 
             <button v-if="props.showShare" @click="emit('share')"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-warning py-1 px-2  transition-all hover:pl-4 hover:bg-warning/20">
