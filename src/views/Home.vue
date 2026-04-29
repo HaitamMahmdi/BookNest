@@ -4,6 +4,7 @@ import BookCardCom from "@/components/BookCard/BookCardCom.vue";
 import { faDragon, faRobot, faGhost, faLandmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useUserBooks } from "../stores/userBooks";
+import LoadingCom from "../components/LoadingCom.vue";
 const userBooks = useUserBooks();
 const books = ref({});
 (async () => {
@@ -46,7 +47,8 @@ const fillteredBooks = ref(null);
 const bookDetail = ref(null);
 </script>
 <template>
-  <div>
+  <LoadingCom v-if="!books"></LoadingCom>
+  <div v-if="books">
     <section class="pt-10 min-h-screen ">
       <ul class=" text-text-main flex flex-wrap h-fit gap-6 mb-8 w-full select-none justify-center  max-sm:text-sm">
         <li @click="() => fillteredBooks === 'fantasy' ? fillteredBooks = '' : fillteredBooks = 'fantasy'"
@@ -93,4 +95,5 @@ const bookDetail = ref(null);
 
     </section>
   </div>
+
 </template>
