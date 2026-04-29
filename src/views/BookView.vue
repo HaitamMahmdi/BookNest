@@ -16,19 +16,21 @@ import {
   faHeart as faHeartRegular,
 } from "@fortawesome/free-regular-svg-icons";
 // components
-import BookCardCom from "../components/BookCard/BookCardCom.vue";
+import BookCardCom from "@/components/BookCard/BookCardCom.vue";
 import ReviewBoxCom from "../components/ReviewBoxCom.vue";
 import AddReviewCom from "../components/AddReviewCom.vue";
 import BookProgressCom from "../components/BookProgressCom.vue";
-import FooterCom from "../components/FooterCom.vue";
+import AddNewShelfCom from "../components/BookCard/AddNewShelfCom.vue";
+import ShowShelfsCom from "../components/BookCard/ShowShelfsCom.vue";
+import LoadingCom from "../components/LoadingCom.vue";
 // store
 import { useUserBooks } from "../stores/userBooks";
 import { useUserAuth } from "../stores/userAuth";
 // composables
 import { useScrollLock } from "../composables/useScrollControl";
 import { useClickOutside } from "@/composables/useClickOutside";
-import AddNewShelfCom from "../components/BookCard/AddNewShelfCom.vue";
-import ShowShelfsCom from "../components/BookCard/ShowShelfsCom.vue";
+import OptionsCom from "../components/OptionsCom.vue";
+
 const { lock, unlock } = useScrollLock();
 const userBooks = useUserBooks();
 const userAuth = useUserAuth();
@@ -79,36 +81,47 @@ const categories = computed(() => {
   return [...new Set(newCategories.map((cat) => cat.trim()))];
 });
 const similarBooks = ref([]);
+
 watch(
   () => book.value,
   (newVal) => {
     if (newVal) {
+
       document.title = `${newVal.volumeInfo.title} - BookNest`;
       if (categories.value.length) {
         (async () => {
           const resp = await fetch(
             `https://www.googleapis.com/books/v1/volumes?q=subject:${categories.value[0]}&orderBy=relevance&langRestrict=en&maxResults=20`,
           );
-          console.log(
-            `https://www.googleapis.com/books/v1/volumes?q=subject:${categories.value[0]}&orderBy=relevance&langRestrict=en&maxResults=20`,
-          );
+
           let data = await resp.json();
           similarBooks.value = data.items;
-
           return;
         })();
       }
     }
   },
 );
+
+
 const showShelfs = ref(false)
 const showAddNewShelfCom = ref(false)
 </script>
 <template>
+  <div v-if="!book" class="w-full h-screen">
+    <LoadingCom></LoadingCom>
+  </div>
   <div v-if="book">
     <div class="container min-h-screen mx-auto py-10 text-text-main">
       <article class="grid grid-cols-[1fr_2fr] max-md:grid-cols-1">
-        <div class="px-4 max-md:flex flex-wrap max-md:justify-center gap-x-4 max-md:mb-10">
+        <div class="px-4 relative max-md:flex flex-wrap max-md:justify-center gap-x-4 max-md:mb-10">
+          <OptionsCom :show-delete="false" :show-edit="false"
+            :container-class="`absolute top-4  flex items-center justify-center rounded-full right-8`"
+            :showFinish="false" :showHide="false"
+            button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
+            :options-list-style="`right-0`">
+
+          </OptionsCom>
           <img class="w-full max-xs:w-full! max-lg:w-60 lg:h-150" :src="book?.volumeInfo?.imageLinks?.thumbnail"
             :alt="book?.volumeInfo.title" />
           <div class="max-xs:w-full max-lg:w-60">
@@ -183,7 +196,7 @@ const showAddNewShelfCom = ref(false)
               <p v-html="book.volumeInfo?.description" class="ml-2 max-sm:ml-0"></p>
             </li>
             <li></li>
-            <li>
+            <li v-if="categories.length">
               <p class="font-bold text-textLg">Categories :</p>
               <p class="ml-2 font-normal text-[1rem]">
                 {{ categories.join(" || ") }}
@@ -273,7 +286,7 @@ const showAddNewShelfCom = ref(false)
         </div>
       </div>
     </section>
-    <section class="py-10 mt-40 mx-auto bg-Shark">
+    <section v-if="similarBooks.length" class="py-10 mt-40 mx-auto bg-Shark">
       <div class="container mx-auto px-4">
         <h3 class="w-fit text-white text-4xl max-sm:mx-auto pt-8 font-bold">
           similar books :
@@ -286,7 +299,6 @@ const showAddNewShelfCom = ref(false)
     <AddNewShelfCom @close="showAddNewShelfCom = false" v-if="showAddNewShelfCom"></AddNewShelfCom>
   </div>
 
-  <FooterCom></FooterCom>
 </template>
 <style scoped>
 .slider {
