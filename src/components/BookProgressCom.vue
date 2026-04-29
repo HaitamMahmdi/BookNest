@@ -5,12 +5,12 @@ import ThoughtItemCom from "./ThoughtItemCom.vue";
 const props = defineProps({
   pagesCount: Number,
   bookID: String,
-  currentPage: Number
+  currentPage: Number,
+  isFinisedBook: Boolean,
+  thoughts: Object,
 });
-
+console.log(props.currentPage)
 const userBooks = useUserBooks()
-const thoughts = computed(() => userBooks.reading.find((book) => book.id === props.bookID))
-const isFinisedBook = computed(() => userBooks.isFinisedBook(props.bookID))
 const value = ref(props.currentPage || 0);
 
 const percentage = computed(() => {
@@ -21,7 +21,7 @@ const showPreviousThoughts = ref(false)
 const words = ref("");
 const newProgrees = async () => {
   if (props.bookID) {
-    await userBooks.updateProgrees(props.bookID, { progrees: value.value, thought: words.value, })
+    await userBooks.updateProgrees(props.bookID, { progrees: Number(value.value), thought: words.value, })
   } else {
     console.error('no id was provided ')
   }
@@ -59,7 +59,8 @@ const newProgrees = async () => {
           class="bg-neutral-800 cursor-pointer text-text-main px-16  block py-2 rounded hover:bg-neutral-700 transition-colors">
         <div class="w-full " v-if="showPreviousThoughts">
           <div class="mt-8 mx-auto" v-if="showPreviousThoughts">
-            <ul>
+            <ul
+              :class="[thoughts?.reading.length >= 4 ? '  grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4' : '']">
               <ThoughtItemCom v-for="(thought, index) in thoughts.reading" :key="thought" :index="index + 1"
                 :textBody="thought.thought" :progrees="thought.progrees" :date="thought.date" :bookID="props.bookID"
                 :thoughtID="thought.id" </ThoughtItemCom>

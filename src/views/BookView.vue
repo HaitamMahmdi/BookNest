@@ -36,8 +36,13 @@ const userBooks = useUserBooks();
 const userAuth = useUserAuth();
 const router = useRouter();
 const book = ref(null);
+
+const thoughts = computed(() => userBooks.reading.find((currbook) => currbook.id === book.value?.id))
+const isFinisedBook = computed(() => userBooks.isFinisedBook(book.value?.id))
+
+
 const userReview = computed(() => {
-  return userBooks.reviews.find((review) => review.bookID === book.value.id);
+  return userBooks.reviews.find((review) => review.bookID === book.value?.id);
   return null;
 });
 (async () => {
@@ -115,15 +120,18 @@ const showAddNewShelfCom = ref(false)
     <div class="container min-h-screen mx-auto py-10 text-text-main">
       <article class="grid grid-cols-[1fr_2fr] max-md:grid-cols-1">
         <div class="px-4 relative max-md:flex flex-wrap max-md:justify-center gap-x-4 max-md:mb-10">
-          <OptionsCom :show-delete="false" :show-edit="false"
-            :container-class="`absolute! top-4  flex items-center justify-center rounded-full right-8`"
-            :showFinish="false" :showHide="false"
-            button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
-            :options-list-style="`right-0`">
+          <div class=" relative">
+            <OptionsCom :show-delete="false" :show-edit="false"
+              :container-class="`absolute! top-2  flex items-center justify-center rounded-full right-2`"
+              :showFinish="false" :showHide="false"
+              button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
+              :options-list-style="`right-0`">
 
-          </OptionsCom>
-          <img class="w-full max-xs:w-full! max-lg:w-60 lg:h-150" :src="book?.volumeInfo?.imageLinks?.thumbnail"
-            :alt="book?.volumeInfo.title" />
+            </OptionsCom>
+            <img class="w-full max-xs:w-full! max-lg:w-60 lg:h-150" :src="book?.volumeInfo?.imageLinks?.thumbnail"
+              :alt="book?.volumeInfo.title" />
+
+          </div>
           <div class="max-xs:w-full max-lg:w-60">
             <button
               @click="userBooks.isFinisedBook(book?.id) ? userBooks.deleteFinishedBook(book.id) : userBooks.addToFinishedBooks(book?.id)"
@@ -242,7 +250,9 @@ const showAddNewShelfCom = ref(false)
     </div>
     <section class="bg-bg-secondary py-10">
       <div class="container mx-auto px-4">
-        <BookProgressCom :pagesCount="book.volumeInfo.pageCount" :currentPage="19" :bookID="book.id"></BookProgressCom>
+        <BookProgressCom :pagesCount="book.volumeInfo.pageCount"
+          :currentPage="thoughts?.reading[thoughts?.reading.length - 1]?.progrees" :bookID="book.id"
+          :isFinisedBook="isFinisedBook" :thoughts="thoughts"></BookProgressCom>
       </div>
     </section>
     <section class="mt-20 py-10 bg-Shark">
