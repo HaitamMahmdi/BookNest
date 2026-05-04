@@ -13,11 +13,21 @@ const routes = [
     },
   },
   {
+    path: "/Profile",
+    name: "Profile",
+    component: () => import("../views/UserProfile.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresEmailVerified: true,
+    },
+  },
+  {
     path: "/Book/:id",
     name: "Book",
     component: () => import("../views/BookView.vue"),
     meta: {
       requiresAuth: true,
+      requiresEmailVerified: true,
     },
   },
   {
