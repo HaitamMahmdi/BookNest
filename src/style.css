@@ -100,9 +100,6 @@
     }
   }
 }
-* {
-  text-transform: capitalize;
-}
 html {
   scroll-behavior: smooth;
 }
@@ -110,4 +107,7 @@ button,
 input,
 textarea {
   outline: none;
+}
+.slider {
+  scrollbar-width: none;
 }
