@@ -37,7 +37,10 @@ export const useUserAuth = defineStore(`userAuth`, {
         const db = getFirestore();
         const colRef = collection(db, "users");
         await setDoc(doc(colRef, userCredential.user.uid), {
-          createdAt: new Date(),
+          coverURL: null,
+          coverImageHistory: [],
+          ProfileImgURL: null,
+          profileImageHistory: [],
           favorites: [],
           shelfs: [
             {
