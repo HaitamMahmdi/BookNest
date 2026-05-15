@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { useUserAuth } from "./userAuth";
+import { useUserStore } from "./userStore";
 import { doc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 export const useUserBooks = defineStore(`userBooks`, {
@@ -80,7 +81,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       const authStore = useUserAuth();
       if (!authStore.user) return;
       const userRef = doc(db, "users", authStore.user.uid);
-
+      const userStore = useUserStore();
       if (this.unsubscribe) {
         this.unsubscribe();
       }
@@ -91,6 +92,11 @@ export const useUserBooks = defineStore(`userBooks`, {
           this.shelfs = data.shelfs;
           this.reading = data.reading;
           this.reviews = data.reviews || [];
+          this.finishedBooks = data.finishedBooks || [];
+          userStore.coverURL = data.coverURL || "";
+          userStore.profileImgURL = data.profileImgURL || "";
+          userStore.coverImageHistory = data.coverImageHistory || [];
+          userStore.profileImageHistory = data.profileImageHistory || [];
         }
       });
     },
