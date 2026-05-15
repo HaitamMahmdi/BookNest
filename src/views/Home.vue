@@ -49,7 +49,7 @@ const bookDetail = ref(null);
 <template>
   <LoadingCom v-if="!books"></LoadingCom>
   <div v-if="books">
-    <section class="pt-10 min-h-screen ">
+    <section class="min-h-screen ">
       <ul class=" text-text-main flex flex-wrap h-fit gap-6 mb-8 w-full select-none justify-center  max-sm:text-sm">
         <li @click="() => fillteredBooks === 'fantasy' ? fillteredBooks = '' : fillteredBooks = 'fantasy'"
           :class="[fillteredBooks === 'fantasy' ? 'bg-white! text-text-secondary!' : '']"

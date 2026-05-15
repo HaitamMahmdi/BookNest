@@ -43,7 +43,7 @@ defineProps({
 .loader-text {
     margin-top: 10px;
     font-size: 14px;
-    color: #555;
+    color: white;
 }
 
 /* Animation */

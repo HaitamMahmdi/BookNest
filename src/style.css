@@ -108,6 +108,25 @@ input,
 textarea {
   outline: none;
 }
-.slider {
-  scrollbar-width: none;
+li {
+  list-style: none;
+}
+body.modal-open {
+  overflow: hidden;
+  padding-right: 10px;
+  background-color: var(--color-bg-main);
+}
+
+@media (max-width: 768px) {
+  body.modal-open {
+    padding-right: 0px;
+  }
+}
+body::-webkit-scrollbar {
+  width: 10px;
+  background-color: var(--color-bg-main);
+}
+body::-webkit-scrollbar-thumb {
+  background-color: #eb8634;
+  border-radius: 200px;
 }
