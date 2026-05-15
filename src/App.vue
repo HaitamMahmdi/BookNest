@@ -24,7 +24,7 @@ onUnmounted(() => {
 <template>
   <header-com v-if="userAuth"></header-com>
 
-  <main class="bg-bg-main min-h-screen">
+  <main class="bg-bg-main min-h-screen py-14">
     <router-view :key="$route.fullPath"></router-view>
   </main>
   <FooterCom></FooterCom>
