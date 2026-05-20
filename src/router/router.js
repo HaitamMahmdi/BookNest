@@ -13,9 +13,21 @@ const routes = [
     },
   },
   {
-    path: "/Profile",
+    path: "/profile/:id",
     name: "Profile",
     component: () => import("../views/UserProfile.vue"),
+    children: [
+      {
+        path: "",
+        name: "ProfileMain",
+        component: () => import("@/views/profile/ProfileMain.vue"),
+      },
+      {
+        path: "currently-reading",
+        name: "CurrentlyReading",
+        component: () => import("@/views/profile/CurrentlyReading.vue"),
+      },
+    ],
     meta: {
       requiresAuth: true,
       requiresEmailVerified: true,

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import SearchbarCom from "./SearchbarCom.vue";
 import {
   faUser,
@@ -13,7 +13,10 @@ import {
   faInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { useUserAuth } from "../stores/userAuth";
 const showDropdown = ref(false);
+const user = useUserAuth()
+const userID = computed(() => user.user)
 const profile = ref(null);
 const handleClick = (e) => {
   if (!showDropdown.value) {
@@ -50,7 +53,7 @@ const handleClick = (e) => {
         </li>
         <li
           class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2">
-          <RouterLink :to="{ name: 'Profile' }" class="flex items-center gap-x-2">
+          <RouterLink :to="{ name: 'Profile', params: { id: userID.uid } }" class="flex items-center gap-x-2">
             <FontAwesomeIcon :icon="faUser" />
             <p>View Profile</p>
           </RouterLink>
