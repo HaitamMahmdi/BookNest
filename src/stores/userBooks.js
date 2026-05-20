@@ -6,7 +6,7 @@ import { db } from "../firebase";
 export const useUserBooks = defineStore(`userBooks`, {
   state: () => ({
     favorites: [],
-    shelfs: [],
+    shelves: [],
     reading: [],
     reviews: [],
     finishedBooks: [],
@@ -18,16 +18,16 @@ export const useUserBooks = defineStore(`userBooks`, {
       return state.favorites.some((book) => book.id === bookId);
     },
     /** Checks if a book is in a specific shelf or in any shelf if no shelfID is provided
-     * @param {string} shelfID - The ID of the shelf to check. If not provided, checks all shelfs.
+     * @param {string} shelfID - The ID of the shelf to check. If not provided, checks all shelves.
      * @param {string} bookID - The ID of the book to check for.
      * @returns {boolean} - Returns true if the book is found in the specified shelf or any shelf, false otherwise.
      */
     isInShelfGetter: (state) => (shelfID, bookID) => {
-      const shelf = state.shelfs.find((s) => s.id === shelfID);
+      const shelf = state.shelves.find((s) => s.id === shelfID);
       if (shelf) {
         return shelf.books.some((book) => book.id === bookID);
       } else if (!shelfID && bookID) {
-        for (const shelf of state.shelfs) {
+        for (const shelf of state.shelves) {
           for (const book of shelf.books) {
             if (book.id === bookID) {
               return true;
@@ -36,7 +36,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         }
       }
     },
-    isFinisedBook: (state) => (bookID) => {
+    isFinishedBook: (state) => (bookID) => {
       return state.finishedBooks.some((id) => id === bookID);
     },
   },
@@ -74,7 +74,7 @@ export const useUserBooks = defineStore(`userBooks`, {
     },
     /**
      * Loads the user's books data from Firestore and sets up a real-time listener.
-     * Updates favorites, shelfs, and reading arrays.
+     * Updates favorites, shelves, and reading arrays.
      * @returns {Promise<void>} - Resolves when the initial load is complete.
      */
     async loadUserBooks() {
@@ -89,7 +89,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         if (docSnap.exists()) {
           const data = docSnap.data();
           this.favorites = data.favorites;
-          this.shelfs = data.shelfs;
+          this.shelves = data.shelves;
           this.reading = data.reading;
           this.reviews = data.reviews || [];
           this.finishedBooks = data.finishedBooks || [];
@@ -115,13 +115,17 @@ export const useUserBooks = defineStore(`userBooks`, {
      * @param {string} shelfName - The name of the new shelf to create.
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
-    async createShelfs(shelfName) {
-      this.shelfs.push({ name: shelfName, books: [], id: crypto.randomUUID() });
+    async createShelves(shelfName) {
+      this.shelves.push({
+        name: shelfName,
+        books: [],
+        id: crypto.randomUUID(),
+      });
       const authStore = useUserAuth();
       if (!authStore.user) return;
       const userRef = doc(db, `users`, authStore.user.uid);
       await updateDoc(userRef, {
-        shelfs: this.shelfs,
+        shelves: this.shelves,
       });
     },
     /**
@@ -134,10 +138,14 @@ export const useUserBooks = defineStore(`userBooks`, {
       if (!authStore.user) {
         return;
       }
-      this.shelfs.push({ name: shelfName, books: [], id: crypto.randomUUID() });
+      this.shelves.push({
+        name: shelfName,
+        books: [],
+        id: crypto.randomUUID(),
+      });
       const userRef = doc(db, `users`, authStore.user.uid);
       await updateDoc(userRef, {
-        shelfs: this.shelfs,
+        shelves: this.shelves,
       });
     },
     /**
@@ -151,7 +159,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       if (!authStore.user) {
         return;
       }
-      const shelf = this.shelfs.find((s) => s.id === shelfID);
+      const shelf = this.shelves.find((s) => s.id === shelfID);
       const isIn = this.isInShelfGetter(shelfID, book.id);
       if (isIn) {
         return;
@@ -160,7 +168,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         shelf.books.push(book);
         const userRef = doc(db, `users`, authStore.user.uid);
         await updateDoc(userRef, {
-          shelfs: this.shelfs,
+          shelves: this.shelves,
         });
       }
     },
@@ -175,18 +183,18 @@ export const useUserBooks = defineStore(`userBooks`, {
       if (!authStore.user) {
         return;
       }
-      const shelf = this.shelfs.find((s) => s.id === shelfID);
+      const shelf = this.shelves.find((s) => s.id === shelfID);
       if (shelf) {
         shelf.books = shelf.books.filter((book) => book.id !== bookId);
-        for (let i = 0; i < this.shelfs.length; i++) {
-          if (this.shelfs[i].id === shelfID) {
-            this.shelfs[i] = shelf;
+        for (let i = 0; i < this.shelves.length; i++) {
+          if (this.shelves[i].id === shelfID) {
+            this.shelves[i] = shelf;
             break;
           }
         }
         const userRef = doc(db, `users`, authStore.user.uid);
         await updateDoc(userRef, {
-          shelfs: this.shelfs,
+          shelves: this.shelves,
         });
       }
     },
@@ -230,10 +238,10 @@ export const useUserBooks = defineStore(`userBooks`, {
     /**
      * update reading progress or add a new progress entry for a book.
      * @param {string} bookID - The ID of the book
-     * @param {object} progObj - object containing (progrees, thought)
+     * @param {object} progObj - object containing (progress, thought)
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
-    async updateProgrees(bookID, progObj) {
+    async updateProgress(bookID, progObj) {
       const authStore = useUserAuth();
       if (!authStore.user) {
         return;
@@ -252,7 +260,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       if (book) {
         book.reading.push({
           id: crypto.randomUUID(),
-          progrees: progObj.progrees,
+          progress: progObj.progress,
           thought: progObj.thought,
           date: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`, // fixed getDay -> getDate
         });
@@ -262,7 +270,7 @@ export const useUserBooks = defineStore(`userBooks`, {
           reading: [
             {
               id: crypto.randomUUID(),
-              progrees: progObj.progrees,
+              progress: progObj.progress,
               thought: progObj.thought,
               date: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
             },
