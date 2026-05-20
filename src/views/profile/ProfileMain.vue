@@ -4,7 +4,7 @@ import { faPen, faBook, faClock, faMessage, faLocation, faCakeCandles, faShare, 
 
 import CarouselCom from '../../components/carousel/CarouselCom.vue'
 import SlideCom from '../../components/carousel/SlideCom.vue';
-import BookCardCom from '../../components/BookCard/BookCardCom.vue';
+import BookCardCom from '../../components/bookCard/BookCardCom.vue';
 
 import { useUserBooks } from '../../stores/userBooks';
 import { useUserStore } from '../../stores/userStore';

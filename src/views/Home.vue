@@ -1,6 +1,6 @@
 <script setup>
 import { onUnmounted, ref } from "vue";
-import BookCardCom from "@/components/BookCard/BookCardCom.vue";
+import BookCardCom from "@/components/bookCard/BookCardCom.vue";
 import { faDragon, faRobot, faGhost, faLandmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useUserBooks } from "../stores/userBooks";

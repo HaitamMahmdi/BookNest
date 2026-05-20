@@ -11,14 +11,14 @@ const props = defineProps({
   book: Object,
 });
 const userBooks = useUserBooks();
-const shelfs = computed(() => userBooks.shelfs);
+const shelves = userBooks.shelves
 
 const container = ref(null);
-const emit = defineEmits(["closeShelfsCom", "openAddNewShelfCom"]);
+const emit = defineEmits(["close-shelve-Com", "open-add-new-Shelf-Com"]);
 
 const handleClickOutside = (event) => {
   if (container.value && !container.value.contains(event.target)) {
-    emit("closeShelfsCom");
+    emit("close-shelves-Com");
   }
 };
 const preventScroll = (e) => {
@@ -71,7 +71,7 @@ onUnmounted(() => {
         userBooks.isInShelfGetter(shelf.id, props.book.id)
           ? userBooks.removeBookFromShelf(shelf.id, props.book.id)
           : userBooks.addBookToShelf(shelf.id, props.book)
-        " class="flex justify-between items-start hover:bg-neutral-700 py-2 px-1 rounded-lg" v-for="shelf in shelfs"
+        " class="flex justify-between items-start hover:bg-neutral-700 py-2 px-1 rounded-lg" v-for="shelf in shelves"
         :key="shelf">
         <p>{{ shelf.name }}</p>
         <FontAwesomeIcon v-if="userBooks.isInShelfGetter(shelf.id, props.book.id)" class="text-lg text-star p-1"

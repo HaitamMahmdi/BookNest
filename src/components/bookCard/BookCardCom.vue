@@ -9,7 +9,7 @@ import { faBookmark, faHeart } from "@fortawesome/free-regular-svg-icons";
 import { faBookmark as solidBookmark } from "@fortawesome/free-solid-svg-icons";
 import { useUserBooks } from "../../stores/userBooks";
 import { computed, ref } from "vue";
-import ShowShelfsCom from "./ShowShelfsCom.vue";
+import showShelves from "./ShowShelves.vue";
 import AddNewShelfCom from "./AddNewShelfCom.vue";
 import OptionsCom from "../OptionsCom.vue";
 const userBooks = useUserBooks();
@@ -18,15 +18,13 @@ const props = defineProps({
   class: String,
 });
 const emit = defineEmits(["showInfos"]);
-const isFavorite = computed(() => {
-  return userBooks.isFavorite(props.book.id);
-});
-const isInShelf = computed(() => {
-  return userBooks.isInShelfGetter("", props.book.id);
-});
-const showShelfs = ref(false);
-function handleShowShelfs() {
-  showShelfs.value = !showShelfs.value;
+const isFavorite = userBooks.isFavorite(props.book.id);
+
+const isInShelf = userBooks.isInShelfGetter("", props.book.id);
+
+const showModal = ref(false);
+function handleShowShelves() {
+  showModal.value = !showModal.value;
 }
 const showAddNewShelfCom = ref(false);
 </script>
@@ -61,12 +59,12 @@ const showAddNewShelfCom = ref(false);
       </div>
     </div>
     <div class="main flex items-center justify-center gap-x-4 mt-4 relative">
-      <button @click="handleShowShelfs" title="add to shelf" class="cursor-pointer">
+      <button @click="handleShowShelves" title="add to shelf" class="cursor-pointer">
         <FontAwesomeIcon v-if="isInShelf" class="text-2xl p-1 text-star" :icon="solidBookmark" />
         <FontAwesomeIcon v-else class="text-2xl p-1" :icon="faBookmark" />
 
-        <ShowShelfsCom @close-shelfs-com="showShelfs = false" @open-add-new-shelf-com="showAddNewShelfCom = true"
-          :book="props.book" v-if="showShelfs"></ShowShelfsCom>
+        <showShelves @close-shelves-com="showModal = false" @open-add-new-shelf-com="showAddNewShelfCom = true"
+          :book="props.book" v-if="showModal"></showShelves>
       </button>
       <button v-if="isFavorite" @click="userBooks.removeFromFavorites(props.book.id)" title="remove from favorites"
         class="cursor-pointer">

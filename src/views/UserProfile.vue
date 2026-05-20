@@ -271,24 +271,24 @@ const imgSelectedForCover = async (id) => {
         </section>
         <section class="profileInfo mt-40 container mx-auto border-t border-bg-secondary ">
             <ul class=" flex flex-wrap max-lg:justify-center">
-                <li class="py-4 px-5 hover:bg-gray-700 transition cursor-pointer rounded-lg">
-                    <RouterLink :to="{ name: 'ProfileMain' }">
+                <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg">
+                    <RouterLink class="p-4 block" :to="{ name: 'ProfileMain' }">
                         <p>All</p>
                     </RouterLink>
                 </li>
-                <li class="p-4 hover:bg-gray-700 transition cursor-pointer rounded-lg max-sm:hidden">
-                    <RouterLink :to="{ name: 'CurrentlyReading' }">
+                <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg max-sm:hidden">
+                    <RouterLink class="p-4 block" :to="{ name: 'CurrentlyReading' }">
                         <p>Books read</p>
                     </RouterLink>
                 </li>
-                <li class="p-4 hover:bg-gray-700 transition cursor-pointer rounded-lg  max-sm:hidden">
-                    <p>Friends</p>
+                <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg  max-sm:hidden">
+                    <p class="p-4">Friends</p>
                 </li>
-                <li class="p-4 hover:bg-gray-700 transition cursor-pointer rounded-lg max-md:hidden">
-                    <p>Favorite books & quotes</p>
+                <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg max-md:hidden">
+                    <p class="p-4 h-full">Favorite books & quotes</p>
                 </li>
-                <li class="p-4  hover:bg-gray-700 transition cursor-pointer rounded-lg max-md:hidden">
-                    <p>About</p>
+                <li class="  hover:bg-gray-700 transition cursor-pointer rounded-lg max-md:hidden">
+                    <p class="p-4">About</p>
                 </li>
                 <li class=" md:hidden translate-x-3/8  ">
                     <button class="  ">

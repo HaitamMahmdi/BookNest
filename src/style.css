@@ -113,15 +113,9 @@ li {
 }
 body.modal-open {
   overflow: hidden;
-  padding-right: 10px;
   background-color: var(--color-bg-main);
 }
 
-@media (max-width: 768px) {
-  body.modal-open {
-    padding-right: 0px;
-  }
-}
 body::-webkit-scrollbar {
   width: 10px;
   background-color: var(--color-bg-main);
