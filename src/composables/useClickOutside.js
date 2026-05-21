@@ -15,14 +15,17 @@ import { onMounted, onBeforeUnmount } from "vue";
  * @returns {void}
  */
 export function useClickOutside(targetRef, callback) {
+  let count = 0;
   const handler = (e) => {
     const el = targetRef.value?.$el || targetRef.value;
 
     if (!el) return;
 
     const clickedInside = el.contains(e.target);
-    if (!clickedInside) {
+    if (!clickedInside && count >= 1) {
       callback(e);
+    } else if (!clickedInside && count <= 1) {
+      count = 1;
     }
   };
 

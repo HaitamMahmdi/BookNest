@@ -4,7 +4,7 @@ import OptionsCom from './OptionsCom.vue';
 const userBooks = useUserBooks()
 const props = defineProps({
     index: Number,
-    progrees: String,
+    progress: Number,
     textBody: String,
     date: String,
     bookID: String,
@@ -16,13 +16,13 @@ const deleteThought = async () => {
 }
 </script>
 <template>
-    <li class="flex flex-col justify-between w-full mx-auto  px-4  bg-Shark">
+    <li class="flex flex-col justify-between gap-4 w-full mx-auto  px-4  bg-Shark">
         <div class=" flex justify-between items-center border-b border-bg-secondary py-2">
             <p>{{ props.index }}</p>
             <div class="flex gap-x-1">
                 <p>page number:</p>
                 <p>{{
-                    props.progrees }}</p>
+                    props.progress }}</p>
             </div>
             <OptionsCom options-list-style="right-0 top-3/6! bg-[#424242]" @delete="deleteThought" :show-hide="false"
                 :show-report="false" :show-finish="false">

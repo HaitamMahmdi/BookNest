@@ -75,8 +75,8 @@ const clickOption = (option) => {
             <slot name="buttonContent"></slot>
             <FontAwesomeIcon v-if="!$slots.buttonContent" :icon="faEllipsisVertical" />
         </button>
-        <div :class="props.optionsListStyle" class="w-30 absolute  rounded-lg  top-full mt-2 bg-Shark  shadow-lg z-10"
-            v-if="showOptions">
+        <div :class="props.optionsListStyle"
+            class="w-30 absolute overflow-hidden rounded-lg  top-full mt-2 bg-Shark  shadow-lg z-10" v-if="showOptions">
 
             <button v-if="props.showShare && !hideAll" @click="clickOption('share')"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-warning py-2 px-3  transition-all hover:pl-4 hover:bg-warning/20">

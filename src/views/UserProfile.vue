@@ -16,11 +16,13 @@ import { nextTick } from 'vue';
 import { useUserBooks } from '../stores/userBooks';
 import { useUserAuth } from '../stores/userAuth';
 import { useUserStore } from '../stores/userStore';
+import { useRoute } from 'vue-router';
 
 import ChangeCoverModal from '../components/modals/ChangeCoverModal.vue';
 import MessageModal from '../components/modals/MessageModal.vue';
 import ChoseImageModal from '../components/modals/ChoseImageModal.vue';
 import LoadingCom from '../components/LoadingCom.vue';
+import { RouterView } from 'vue-router';
 const userStore = useUserStore();
 const coverUrl = computed(() => userStore.coverURL)
 const profileUrl = computed(() => userStore.profileImgURL)
@@ -30,6 +32,8 @@ const profileHistory = computed(() => userStore.profileImageHistory)
 const userBooks = useUserBooks();
 const messageKey = ref(0)
 const userAuth = useUserAuth();
+const route = useRoute();
+const profileId = computed(() => route.params.id);
 
 const fileInput = ref(null);
 const previewUrl = reactive({
@@ -257,7 +261,6 @@ const imgSelectedForCover = async (id) => {
                                     @image-selected="showChoseModal === 1 ? imgSelectedForCover($event) : imgSelectedForProfile($event)"
                                     @file-uploaded="handleFile" @close="showChoseModal = 0" :show="showChoseModal"
                                     :isFor="showChoseModal === 1 ? 'cover' : 'profile'">
-                                    >
                                 </ChoseImageModal>
                             </button>
 
@@ -272,12 +275,12 @@ const imgSelectedForCover = async (id) => {
         <section class="profileInfo mt-40 container mx-auto border-t border-bg-secondary ">
             <ul class=" flex flex-wrap max-lg:justify-center">
                 <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg">
-                    <RouterLink class="p-4 block" :to="{ name: 'ProfileMain' }">
+                    <RouterLink class="p-4 block" :to="{ name: 'ProfileMain', params: { id: profileId } }">
                         <p>All</p>
                     </RouterLink>
                 </li>
                 <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg max-sm:hidden">
-                    <RouterLink class="p-4 block" :to="{ name: 'CurrentlyReading' }">
+                    <RouterLink class="p-4 block" :to="{ name: 'CurrentlyReading', params: { id: profileId } }">
                         <p>Books read</p>
                     </RouterLink>
                 </li>
@@ -291,7 +294,7 @@ const imgSelectedForCover = async (id) => {
                     <p class="p-4">About</p>
                 </li>
                 <li class=" md:hidden translate-x-3/8  ">
-                    <button class="  ">
+                    <button class=" ">
                         <OptionsCom
                             :button-class="`hover:bg-gray-700 transition cursor-pointer rounded-lg hover:bg-gray-700 p-4 flex items-center gap-x-2 text-white  focus:bg-gray-700`"
                             :options-list-style="`right-3/6! translate-x-[27.6%] bg-bg-main  shadow-max rounded-lg  p-2 min-w-[300px]`"
@@ -315,16 +318,14 @@ const imgSelectedForCover = async (id) => {
                 </li>
 </template>
 </OptionsCom>
-
 </button>
-
 </li>
-
 </ul>
 </section>
+<router-view></router-view>
 
 </div>
-<RouterView></RouterView>
+
 </template>
 <style scoped>
 .slider {

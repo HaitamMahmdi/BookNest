@@ -2,9 +2,11 @@
 import { onMounted, onUnmounted, reactive, ref, useTemplateRef } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-import { useUserBooks } from "../stores/userBooks";
-const emit = defineEmits('submit')
+import { useUserBooks } from "@/stores/userBooks";
+import { useClickOutside } from "@/composables/useClickOutside";
+const emit = defineEmits(['submit', 'close'])
 const props = defineProps({
+  show: Boolean,
   bookID: {
     type: String,
     required: true,
@@ -19,7 +21,12 @@ const reviewObj = reactive({
   date: '',
 });
 const errorMessage = ref("");
-
+const container = ref(null)
+useClickOutside(container, () => {
+  props.show = false
+  container.value.reset
+  emit('close')
+})
 const changeStare = (e) => {
   errorMessage.value = ''
   const starId = e.target.closest("svg").id;
@@ -31,68 +38,43 @@ const changeStare = (e) => {
       star.value[i]?.$el.classList.remove("text-yellow-400");
     }
   }
-reviewObj.rating = starIndex;
+  reviewObj.rating = starIndex;
 };
-const addnewReview = async () => {
-  if(!reviewObj.title || !reviewObj.body || reviewObj.rating === 0){
+const addNewReview = async () => {
+  if (!reviewObj.title || !reviewObj.body || reviewObj.rating === 0) {
     errorMessage.value = "Please fill in all required fields and select a star rating";
     return;
   }
-const date = new Date()
-reviewObj.date = `${date.getFullYear}-${date.getMonth}-${date.getDay}`
- await userBooks.addNewReview(props.bookID, reviewObj);
+  const date = new Date()
+  reviewObj.date = `${date.getFullYear}-${date.getMonth}-${date.getDay}`
+  await userBooks.addNewReview(props.bookID, reviewObj);
   errorMessage.value = "";
- emit('submitReview')
+  emit('submitReview')
 }
 </script>
 <template>
-  <form
-  id="reviewCom"
-    @submit.prevent
-    class="w-3/4 text-text-main bg-Shark fixed z-20 p-4 rounded-lg shadow-max top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-  >
+  <form v-if="show" ref="container" id="reviewCom" @submit.prevent
+    class="w-3/4 text-text-main bg-Shark fixed z-20 p-4 rounded-lg shadow-max top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
     <div class="flex items-center gap-x-px mb-2">
       <p class="mr-4 text-lg">add star count:</p>
-      <FontAwesomeIcon
-        @click="changeStare"
-        v-for="(star, index) in 5"
-        :key="star"
-        ref="star"
-        :id="`star${index + 1}`"
-        class="cursor-pointer"
-        :icon="faStar"
-      />
+      <FontAwesomeIcon @click="changeStare" v-for="(star, index) in 5" :key="star" ref="star" :id="`star${index + 1}`"
+        class="cursor-pointer" :icon="faStar" />
     </div>
     <div>
       <label for="review" class="text-lg mb-2 block">title:</label>
-      <input
-        type="text"
-        @focus="errorMessage=''"
-        id="review"
-        v-model="reviewObj.title"
-        placeholder="title"
-        class="w-full p-2 bg-bg-main rounded mb-4 border border-transparent focus:border-text-main"
-      />
+      <input type="text" @focus="errorMessage = ''" id="review" v-model="reviewObj.title" placeholder="title"
+        class="w-full p-2 bg-bg-main rounded mb-4 border border-transparent focus:border-text-main" />
     </div>
     <div>
       <label for="review-body" class="text-lg mb-2 block">Your Review:</label>
-      <textarea
-              @focus="errorMessage=''"
-
-        type="text"
-        v-model="reviewObj.body"
-        id="review-body"
+      <textarea @focus="errorMessage = ''" type="text" v-model="reviewObj.body" id="review-body"
         placeholder="Write your review here..."
-        class="w-full p-2 bg-bg-main rounded mb-4 border border-transparent max-h-36 min-h-36 focus:border-text-main"
-      >
+        class="w-full p-2 bg-bg-main rounded mb-4 border border-transparent max-h-36 min-h-36 focus:border-text-main">
       </textarea>
     </div>
-    <input
-    @click="addnewReview"
-      type="submit"
-      class="bg-green-400 cursor-pointer text-text-main px-4 py-2 rounded hover:bg-green-500 transition-colors"
-    >
+    <input @click="addNewReview" type="submit"
+      class="bg-green-400 cursor-pointer text-text-main px-4 py-2 rounded hover:bg-green-500 transition-colors">
     </input>
-    <p class=" mx-auto mt-2 text-lg text-center text-error font-semibold">{{errorMessage}}</p>
+    <p class=" mx-auto mt-2 text-lg text-center text-error font-semibold">{{ errorMessage }}</p>
   </form>
 </template>

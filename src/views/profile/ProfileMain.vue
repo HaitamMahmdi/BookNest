@@ -14,7 +14,7 @@ import { storeToRefs } from 'pinia';
 const userStore = useUserStore()
 const userBooks = useUserBooks()
 
-const { favorites, shelfs, reading, reviews } = storeToRefs(userBooks)
+const { favorites, shelves, reading, reviews } = storeToRefs(userBooks)
 </script>
 <template>
     <section class=" text-white  bg-Shark pt-4">

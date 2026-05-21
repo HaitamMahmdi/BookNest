@@ -42,7 +42,7 @@ export const useUserAuth = defineStore(`userAuth`, {
           ProfileImgURL: null,
           profileImageHistory: [],
           favorites: [],
-          shelfs: [
+          shelves: [
             {
               name: "default",
               books: [],

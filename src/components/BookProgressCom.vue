@@ -6,10 +6,9 @@ const props = defineProps({
   pagesCount: Number,
   bookID: String,
   currentPage: Number,
-  isFinisedBook: Boolean,
+  isFinished: Boolean,
   thoughts: Object,
 });
-console.log(props.currentPage)
 const userBooks = useUserBooks()
 const value = ref(props.currentPage || 0);
 
@@ -19,9 +18,9 @@ const percentage = computed(() => {
 });
 const showPreviousThoughts = ref(false)
 const words = ref("");
-const newProgrees = async () => {
+const newProgress = async () => {
   if (props.bookID) {
-    await userBooks.updateProgrees(props.bookID, { progrees: Number(value.value), thought: words.value, })
+    await userBooks.updateProgress(props.bookID, { progress: Number(value.value), thought: words.value, })
   } else {
     console.error('no id was provided ')
   }
@@ -33,7 +32,7 @@ const newProgrees = async () => {
     <h3 class="text-lg">your progress :</h3>
     <div class=" relative">
       <span class=" absolute block -top-4 right-0">{{ value }}/{{ props.pagesCount }}</span>
-      <input :disabled="isFinisedBook" :value="isFinisedBook ? value = props.pagesCount : value" type="range" min="0"
+      <input :disabled="isFinished" :value="isFinished ? value = props.pagesCount : value" type="range" min="0"
         :max="pagesCount" v-model="value" :style="{
           '--value': percentage
         }" </div>
@@ -51,21 +50,19 @@ const newProgrees = async () => {
 
         <span class="w-0 peer-focus:w-full transition-all duration-150 bottom-0 h-0.5 bg-amber-50 block"></span>
       </div>
-      <div class=" flex flex-wrap items-center justify-center gap-x-2 w-full  mt-8">
-        <input type="submit" @click="newProgrees"
+      <div class=" flex flex-wrap items-center justify-center gap-x-2 gap-y-3 w-full  mt-8">
+        <input type="submit" @click="newProgress"
           class="bg-green-400 cursor-pointer max-sm:w-full max-sm:mb-4  text-text-main px-16 block py-2 rounded hover:bg-green-500 transition-colors" />
         <input @click="showPreviousThoughts = !showPreviousThoughts" type="button"
-          :value="showPreviousThoughts && thoughts.reading.length ? 'hide previous thoughts' : 'see previous thoughts'"
+          :value="showPreviousThoughts && thoughts.reading.length ? 'hide previous thoughts' : `see previous thoughts (${thoughts.reading.length})`"
           class="bg-neutral-800 cursor-pointer text-text-main px-16  block py-2 rounded hover:bg-neutral-700 transition-colors">
         <div class="w-full " v-if="showPreviousThoughts">
-          <div class="mt-8 mx-auto" v-if="showPreviousThoughts">
-            <ul
-              :class="[thoughts?.reading.length >= 4 ? '  grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4' : '']">
-              <ThoughtItemCom v-for="(thought, index) in thoughts.reading" :key="thought" :index="index + 1"
-                :textBody="thought.thought" :progrees="thought.progrees" :date="thought.date" :bookID="props.bookID"
-                :thoughtID="thought.id" </ThoughtItemCom>
-            </ul>
-          </div>
+          <ul
+            :class="[thoughts?.reading.length >= 4 ? '  grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4' : ' flex flex-col gap-4']">
+            <ThoughtItemCom v-for="(thought, index) in thoughts.reading" :key="thought" :index="index + 1"
+              :textBody="thought.thought" :progress="thought.progress" :date="thought.date" :bookID="props.bookID"
+              :thoughtID="thought.id" </ThoughtItemCom>
+          </ul>
         </div>
       </div>
   </form>

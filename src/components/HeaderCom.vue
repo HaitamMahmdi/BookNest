@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useUserAuth } from "../stores/userAuth";
 const showDropdown = ref(false);
 const user = useUserAuth()
-const userID = computed(() => user.user)
+const userID = computed(() => user.user?.uid)
 const profile = ref(null);
 const handleClick = (e) => {
   if (!showDropdown.value) {
@@ -44,16 +44,17 @@ const handleClick = (e) => {
         <li class="flex items-center justify-center py-4 sm:hidden">
           <SearchbarCom></SearchbarCom>
         </li>
-        <li
-          class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2">
-          <RouterLink :to="{ name: 'Home' }" class="flex items-center gap-x-2">
+        <li>
+          <RouterLink :to="{ name: 'Home' }"
+            class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2">
             <FontAwesomeIcon :icon="faHouse" />
             <p>Home</p>
           </RouterLink>
         </li>
-        <li
-          class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2">
-          <RouterLink :to="{ name: 'Profile', params: { id: userID.uid } }" class="flex items-center gap-x-2">
+        <li>
+          <RouterLink
+            class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
+            v-if="userID" :to="{ name: 'ProfileMain', params: { id: userID } }">
             <FontAwesomeIcon :icon="faUser" />
             <p>View Profile</p>
           </RouterLink>
@@ -61,7 +62,7 @@ const handleClick = (e) => {
         <li
           class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2">
           <FontAwesomeIcon :icon="faBookmark" />
-          <p>Your Shelfs</p>
+          <p>Your shelves</p>
         </li>
         <li
           class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2">

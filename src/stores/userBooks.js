@@ -23,6 +23,7 @@ export const useUserBooks = defineStore(`userBooks`, {
      * @returns {boolean} - Returns true if the book is found in the specified shelf or any shelf, false otherwise.
      */
     isInShelfGetter: (state) => (shelfID, bookID) => {
+      console.log(state.shelves);
       const shelf = state.shelves.find((s) => s.id === shelfID);
       if (shelf) {
         return shelf.books.some((book) => book.id === bookID);

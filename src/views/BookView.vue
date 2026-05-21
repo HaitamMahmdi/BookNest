@@ -16,35 +16,41 @@ import {
   faHeart as faHeartRegular,
 } from "@fortawesome/free-regular-svg-icons";
 // components
-import BookCardCom from "@/components/BookCard/BookCardCom.vue";
+import BookCardCom from "@/components/bookCard/BookCardCom.vue";
 import ReviewBoxCom from "../components/ReviewBoxCom.vue";
 import AddReviewCom from "../components/AddReviewCom.vue";
 import BookProgressCom from "../components/BookProgressCom.vue";
-import AddNewShelfCom from "../components/BookCard/AddNewShelfCom.vue";
-import showShelvesCom from "../components/BookCard/showShelvesCom.vue";
+import AddNewShelfCom from "../components/bookCard/AddNewShelfCom.vue";
+import showShelves from "../components/bookCard/ShowShelves.vue";
 import LoadingCom from "../components/LoadingCom.vue";
+import OptionsCom from "../components/OptionsCom.vue";
 // store
 import { useUserBooks } from "../stores/userBooks";
 import { useUserAuth } from "../stores/userAuth";
-// composables
-import { useScrollLock } from "../composables/useScrollControl";
-import { useClickOutside } from "@/composables/useClickOutside";
-import OptionsCom from "../components/OptionsCom.vue";
 
-const { lock, unlock } = useScrollLock();
 const userBooks = useUserBooks();
 const userAuth = useUserAuth();
 const router = useRouter();
 const book = ref(null);
 
 const thoughts = computed(() => userBooks.reading.find((currbook) => currbook.id === book.value?.id))
-const isFinishedBook = computed(() => userBooks.isFinishedBook(book.value?.id))
+const isFinishedBook = userBooks.isFinishedBook(book.value?.id)
 
 
 const userReview = computed(() => {
   return userBooks.reviews.find((review) => review.bookID === book.value?.id);
   return null;
 });
+book.value = {
+  id: 'I forgger',
+  volumeInfo: {
+    pageCount: 500,
+    publisher: "just me",
+    title: 'the best book ever',
+    averageRating: 4,
+  }
+}
+/*
 (async () => {
   const resp = await fetch(
     `https://www.googleapis.com/books/v1/volumes/${router.currentRoute.value.params.id}`,
@@ -53,29 +59,11 @@ const userReview = computed(() => {
   book.value = data;
   return;
 })();
+*/
 const addReviewCom = ref(null);
-const toggleButton = useTemplateRef("toggleButton");
 const showAddReviewCom = ref(false);
-const openModal = () => {
-  showAddReviewCom.value = true;
-  lock();
-};
 
-const closeModal = () => {
-  showAddReviewCom.value = false;
-  unlock();
-};
 
-/* click outside closes modal */
-useClickOutside(addReviewCom, () => {
-  if (showAddReviewCom.value) closeModal();
-});
-
-/* toggle button */
-const toggleAddReviewCom = () => {
-  if (showAddReviewCom.value) closeModal();
-  else openModal();
-};
 
 const categories = computed(() => {
   if (!book.value || !book.value.volumeInfo.categories) return [];
@@ -109,8 +97,12 @@ watch(
 );
 
 
-const showShelves = ref(false)
+const showModal = ref(false)
 const showAddNewShelfCom = ref(false)
+
+const submitReview = async (bookID) => {
+  await userBooks.addNewReview(bookID)
+}
 </script>
 <template>
   <div v-if="!book" class="w-full h-screen">
@@ -159,7 +151,7 @@ const showAddNewShelfCom = ref(false)
                 <FontAwesomeIcon :icon="faHeartSolid" />
               </div>
             </button>
-            <button @click="showShelves = !showShelves"
+            <button @click="showModal = !showModal"
               class="lg:text-2xl relative bg-neutral-800 text-sm cursor-pointer font-semibold text-text-main p-2 rounded-md mt-4 w-full">
               <div v-if="!userBooks.isInShelfGetter(null, book.id)"
                 class="max-w-55 flex items-center justify-between mx-auto">
@@ -170,8 +162,8 @@ const showAddNewShelfCom = ref(false)
                 <p class="text-lg">On shelf</p>
                 <FontAwesomeIcon class=" text-star" :icon="faBookmark" />
               </div>
-              <showShelvesCom v-if="showShelves" :class="`w-full text-lg`" @closeShelfsCom="showShelves = false"
-                @openAddNewShelfCom="showAddNewShelfCom = true" :book="book"></showShelvesCom>
+              <showShelves v-if="showModal" :class="`w-full text-lg`" @close-shelves-com="showModal = false"
+                @open-add-new-shelf-com="showAddNewShelfCom = true" :book="book"></showShelves>
             </button>
           </div>
         </div>
@@ -253,7 +245,7 @@ const showAddNewShelfCom = ref(false)
       <div class="container mx-auto px-4">
         <BookProgressCom :pagesCount="book.volumeInfo.pageCount"
           :currentPage="thoughts?.reading[thoughts?.reading.length - 1]?.progress" :bookID="book.id"
-          :isFinishedBook="isFinishedBook" :thoughts="thoughts"></BookProgressCom>
+          :isFinished="isFinishedBook" :thoughts="thoughts"></BookProgressCom>
       </div>
     </section>
     <section class="mt-20 py-10 bg-Shark">
@@ -262,12 +254,13 @@ const showAddNewShelfCom = ref(false)
           users reviews
           <span class="text-2xl text-[#888] font-normal">({{ book.volumeInfo.ratingsCount || 0 }})</span>
         </h3>
-        <button ref="toggleButton" @click="toggleAddReviewCom" id="part" v-if="!userReview"
+        <button ref="toggleButton" @click="showAddReviewCom = !showAddReviewCom" id="part" v-if="!userReview"
           class="ml-auto flex items-center cursor-pointer group text-text-main max-sm:mt-4">
           <FontAwesomeIcon id="part" class="mr-2" :icon="faPenToSquare" />
           <p id="part" class="group-hover:underline">add your review</p>
         </button>
-        <AddReviewCom :bookID="book.id" v-if="showAddReviewCom" ref="addReviewCom" @submitReview="closeModal" />
+        <AddReviewCom :bookID="book.id" :show="showAddReviewCom" @close="showAddReviewCom = false"
+          v-if="showAddReviewCom" ref="addReviewCom" @submitReview="submitReview" />
 
         <div class="slider flex overflow-x-scroll w-full mt-8 mx-auto">
           <ReviewBoxCom v-if="userReview" :class="`min-w-[300px] bg-blue-600 mx-auto `" :obj="{
@@ -289,7 +282,7 @@ const showAddNewShelfCom = ref(false)
             <p class="font-bold text-center mt-4 text-text-main text-2xl">
               add your review
             </p>
-            <button @click="toggleAddReviewCom" id="part"
+            <button @click="showAddReviewCom = true" id="part"
               class="px-4 py-2 cursor-pointer bg-primary mx-auto block bg-bg-main mt-10 text-white rounded-lg hover:bg-blue-600">
               add new review
             </button>
