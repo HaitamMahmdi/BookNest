@@ -18,9 +18,9 @@ const props = defineProps({
   class: String,
 });
 const emit = defineEmits(["showInfos"]);
-const isFavorite = userBooks.isFavorite(props.book.id);
+const isFavorite = computed(() => userBooks.isFavorite(props.book.id))
 
-const isInShelf = userBooks.isInShelfGetter("", props.book.id);
+const isInShelf = computed(() => userBooks.isInShelfGetter("", props.book.id))
 
 const showModal = ref(false);
 function handleShowShelves() {

@@ -9,7 +9,7 @@
  */
 import { computed, reactive, ref, watch } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEllipsis, faCamera, faImage, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis, faCamera, faImage, faUpload, faSortDown } from '@fortawesome/free-solid-svg-icons';
 import OptionsCom from '../components/OptionsCom.vue';
 import { useScrollLock } from '../composables/useScrollControl';
 import { nextTick } from 'vue';
@@ -272,7 +272,7 @@ const imgSelectedForCover = async (id) => {
 
             </div>
         </section>
-        <section class="profileInfo mt-40 container mx-auto border-t border-bg-secondary ">
+        <section class="profileInfo relative z-20 mt-40 container mx-auto border-t border-bg-secondary ">
             <ul class=" flex flex-wrap max-lg:justify-center">
                 <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg">
                     <RouterLink class="p-4 block" :to="{ name: 'ProfileMain', params: { id: profileId } }">
@@ -297,10 +297,10 @@ const imgSelectedForCover = async (id) => {
                     <button class=" ">
                         <OptionsCom
                             :button-class="`hover:bg-gray-700 transition cursor-pointer rounded-lg hover:bg-gray-700 p-4 flex items-center gap-x-2 text-white  focus:bg-gray-700`"
-                            :options-list-style="`right-3/6! translate-x-[27.6%] bg-bg-main  shadow-max rounded-lg  p-2 min-w-[300px]`"
+                            :options-list-style="`right-3/6! z-100! translate-x-[27.6%] bg-bg-main  shadow-max rounded-lg  p-2 min-w-[300px]`"
                             :hide-all="true">
                             <template #buttonContent>
-                                <FontAwesomeIcon :icon="faEllipsis" />
+                                <FontAwesomeIcon :icon="faSortDown" />
                                 <p>More</p>
                             </template>
                             <template #customOptions>
