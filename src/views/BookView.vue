@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, useTemplateRef } from "vue";
+import { ref, computed, watch, useTemplateRef, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 // icons
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -10,6 +10,7 @@ import {
   faPenToSquare,
   faHeart as faHeartSolid,
   faCheck,
+  faRemove,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faShareFromSquare,
@@ -33,41 +34,46 @@ const userAuth = useUserAuth();
 const router = useRouter();
 const book = ref(null);
 
-const thoughts = computed(() => userBooks.reading.find((currbook) => currbook.id === book.value?.id))
-const isFinishedBook = userBooks.isFinishedBook(book.value?.id)
-
-
+(async () => {
+  const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
+  const resp = await fetch(
+    `https://www.googleapis.com/books/v1/volumes/${router.currentRoute.value.params.id}?key=${apiKey}`,
+  );
+  let data = await resp.json();
+  console.log(data)
+  book.value = data;
+  return;
+})();
+const isFinishedBook = computed(() => userBooks.isFinishedBook(book.value?.id))
 const userReview = computed(() => {
   return userBooks.reviews.find((review) => review.bookID === book.value?.id);
   return null;
 });
-book.value = {
-  id: 'I forgger',
-  volumeInfo: {
-    pageCount: 500,
-    publisher: "just me",
-    title: 'the best book ever',
-    averageRating: 4,
-  }
-}
-/*
-(async () => {
-  const resp = await fetch(
-    `https://www.googleapis.com/books/v1/volumes/${router.currentRoute.value.params.id}`,
-  );
-  let data = await resp.json();
-  book.value = data;
-  return;
-})();
-*/
 const addReviewCom = ref(null);
 const showAddReviewCom = ref(false);
 
+const thoughts = computed(() => {
+  const currentBook = book.value?.id
+  if (isFinishedBook.value && currentBook) {
 
+    const finishedBook = userBooks.finishedBooks.find((book) => book.book.id === currentBook)
+    console.log(finishedBook)
+    return finishedBook.thoughts
+  }
+  if (userBooks.reading.length && currentBook) {
+    for (const item of userBooks.reading) {
+      console.log(item.book.id, currentBook)
+      if (item.book.id === currentBook) {
+        console.log(`we found the book`)
+        return item.thoughts
+      }
+    }
+  }
+  return []
+})
 
 const categories = computed(() => {
   if (!book.value || !book.value.volumeInfo.categories) return [];
-
   const newCategories = book.value.volumeInfo.categories.flatMap((category) =>
     category.split("/"),
   );
@@ -78,24 +84,32 @@ const similarBooks = ref([]);
 watch(
   () => book.value,
   (newVal) => {
-    if (newVal) {
-
-      document.title = `${newVal.volumeInfo.title} - BookNest`;
-      if (categories.value.length) {
-        (async () => {
-          const resp = await fetch(
-            `https://www.googleapis.com/books/v1/volumes?q=subject:${categories.value[0]}&orderBy=relevance&langRestrict=en&maxResults=20`,
-          );
-
-          let data = await resp.json();
-          similarBooks.value = data.items;
-          return;
-        })();
-      }
-    }
+    document.title = `${newVal.volumeInfo.title} - BookNest`;
+    /*
+        if (newVal) {
+          const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
+    
+          if (categories.value.length) {
+            (async () => {
+              const resp = await fetch(
+                `https://www.googleapis.com/books/v1/volumes?q=subject:${categories.value[0]}&orderBy=relevance&langRestrict=en&maxResults=20?key=${apiKey}`,
+              );
+              let data = await resp.json();
+              similarBooks.value = data.items;
+              console.log(similarBooks.value)
+    
+              return;
+            })();
+          }
+        }
+        */
   },
 );
 
+onBeforeUnmount(() => {
+  document.title = `BookNest`;
+
+})
 
 const showModal = ref(false)
 const showAddNewShelfCom = ref(false)
@@ -105,6 +119,7 @@ const submitReview = async (bookID) => {
 }
 </script>
 <template>
+
   <div v-if="!book" class="w-full h-screen">
     <LoadingCom></LoadingCom>
   </div>
@@ -125,10 +140,9 @@ const submitReview = async (bookID) => {
 
           </div>
           <div class="max-xs:w-full max-lg:w-60">
-            <button
-              @click="userBooks.isFinishedBook(book?.id) ? userBooks.deleteFinishedBook(book.id) : userBooks.addToFinishedBooks(book?.id)"
-              :class="[userBooks.isFinishedBook(book?.id) ? 'text-green-400 bg-white font-bold  ' : 'text-text-main bg-green-400 font-semibold']"
-              class="lg:text-2xl text-sm cursor-pointer   px-2 py-2 rounded-md mt-4 w-full">
+            <button @click="userBooks.addToFinishedBooks(book)"
+              :class="[userBooks.isFinishedBook(book?.id) ? 'text-green-400 bg-white font-bold cursor-default  ' : 'cursor-pointer text-text-main bg-green-400 font-semibold']"
+              class="lg:text-2xl text-sm    px-2 py-2 rounded-md mt-4 w-full">
               <div v-if="!userBooks.isFinishedBook(book?.id)"
                 class="max-w-55 flex items-center justify-between mx-auto">
                 <p>mark as read</p>
@@ -244,8 +258,8 @@ const submitReview = async (bookID) => {
     <section class="bg-bg-secondary py-10">
       <div class="container mx-auto px-4">
         <BookProgressCom :pagesCount="book.volumeInfo.pageCount"
-          :currentPage="thoughts?.reading[thoughts?.reading.length - 1]?.progress" :bookID="book.id"
-          :isFinished="isFinishedBook" :thoughts="thoughts"></BookProgressCom>
+          :currentPage="thoughts?.length ? thoughts[thoughts.length - 1].progress : 0" :bookID="book.id"
+          :isFinished="isFinishedBook" :book="book" :thoughts="thoughts"></BookProgressCom>
       </div>
     </section>
     <section class="mt-20 py-10 bg-Shark">

@@ -5,9 +5,10 @@ import ThoughtItemCom from "./ThoughtItemCom.vue";
 const props = defineProps({
   pagesCount: Number,
   bookID: String,
+  book: Object,
   currentPage: Number,
   isFinished: Boolean,
-  thoughts: Object,
+  thoughts: Array,
 });
 const userBooks = useUserBooks()
 const value = ref(props.currentPage || 0);
@@ -19,8 +20,9 @@ const percentage = computed(() => {
 const showPreviousThoughts = ref(false)
 const words = ref("");
 const newProgress = async () => {
-  if (props.bookID) {
-    await userBooks.updateProgress(props.bookID, { progress: Number(value.value), thought: words.value, })
+  if (props.isFinished) return
+  if (props.book) {
+    await userBooks.updateProgress(props.book, { progress: Number(value.value), thought: words.value, })
   } else {
     console.error('no id was provided ')
   }
@@ -32,17 +34,19 @@ const newProgress = async () => {
     <h3 class="text-lg">your progress :</h3>
     <div class=" relative">
       <span class=" absolute block -top-4 right-0">{{ value }}/{{ props.pagesCount }}</span>
-      <input :disabled="isFinished" :value="isFinished ? value = props.pagesCount : value" type="range" min="0"
-        :max="pagesCount" v-model="value" :style="{
+      <input :class="[props.isFinished ? 'cursor-default' : 'cursor-pointer']" :disabled="props.isFinished"
+        :value="props.isFinished ? value = props.pagesCount : value" type="range" min="0" :max="pagesCount"
+        v-model="value" :style="{
           '--value': percentage
         }" </div>
       <div class="relative bg-Shark mt-4 rounded-lg overflow-hidden">
-        <input class="w-full peer py-2 pl-4 pr-18 bg-transparent rounded " v-model="words" @paste.prevent @beforeinput="
-          (e) =>
-            words.length === 150 && e.inputType.startsWith('insert')
-              ? e.preventDefault()
-              : ''
-        " placeholder="your thoughts after today's reading..." type="text" max="150" />
+        <input class="w-full peer py-2 pl-4 pr-18 bg-transparent rounded " :disabled="props.isFinished" v-model="words"
+          @paste.prevent @beforeinput="
+            (e) =>
+              words.length === 150 && e.inputType.startsWith('insert')
+                ? e.preventDefault()
+                : ''
+          " placeholder="your thoughts after today's reading..." type="text" max="150" />
         <span :class="[words.length === 150 ? 'text-error' : 'text-[#DDD] ']"
           class="text-sm absolute right-4 top-3/6 transform -translate-y-1/2">
           {{ words.length }}/150
@@ -52,14 +56,15 @@ const newProgress = async () => {
       </div>
       <div class=" flex flex-wrap items-center justify-center gap-x-2 gap-y-3 w-full  mt-8">
         <input type="submit" @click="newProgress"
-          class="bg-green-400 cursor-pointer max-sm:w-full max-sm:mb-4  text-text-main px-16 block py-2 rounded hover:bg-green-500 transition-colors" />
+          :class="[props.isFinished ? 'bg-green-800 ' : 'bg-green-400 hover:bg-green-500 cursor-pointer transition-colors']"
+          class="bg-green-400  max-sm:w-full max-sm:mb-4  text-text-main px-16 block py-2 rounded " />
         <input @click="showPreviousThoughts = !showPreviousThoughts" type="button"
-          :value="showPreviousThoughts && thoughts.reading.length ? 'hide previous thoughts' : `see previous thoughts (${thoughts.reading.length})`"
+          :value="showPreviousThoughts && props.thoughts.length ? 'hide previous thoughts' : `see previous thoughts (${props.thoughts?.length})`"
           class="bg-neutral-800 cursor-pointer text-text-main px-16  block py-2 rounded hover:bg-neutral-700 transition-colors">
         <div class="w-full " v-if="showPreviousThoughts">
           <ul
-            :class="[thoughts?.reading.length >= 4 ? '  grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4' : ' flex flex-col gap-4']">
-            <ThoughtItemCom v-for="(thought, index) in thoughts.reading" :key="thought" :index="index + 1"
+            :class="[props.thoughts.length >= 4 ? '  grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4' : ' flex flex-col gap-4']">
+            <ThoughtItemCom v-for="(thought, index) in props.thoughts" :key="thought" :index="index + 1"
               :textBody="thought.thought" :progress="thought.progress" :date="thought.date" :bookID="props.bookID"
               :thoughtID="thought.id" </ThoughtItemCom>
           </ul>
@@ -74,8 +79,6 @@ input[type="range"] {
   width: 100%;
   height: 0.3rem;
   border-radius: 1rem;
-  cursor: pointer;
-
   background: linear-gradient(to right,
       hsl(120, 97%, 71%) 0%,
       hsl(140, 100%, 65%) var(--value),

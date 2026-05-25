@@ -9,16 +9,17 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 const props = defineProps({
   book: Object,
+  class: String,
 });
 const userBooks = useUserBooks();
 const shelves = userBooks.shelves
 
 const container = ref(null);
-const emit = defineEmits(["close-shelve-Com", "open-add-new-Shelf-Com"]);
+const emit = defineEmits(["close-shelves-com", "open-add-new-shelves-com"]);
 
 const handleClickOutside = (event) => {
   if (container.value && !container.value.contains(event.target)) {
-    emit("close-shelves-Com");
+    emit("close-shelves-com");
   }
 };
 const preventScroll = (e) => {
@@ -59,10 +60,11 @@ onUnmounted(() => {
 });
 </script>
 <template>
-  <div ref="container" class="bg-neutral-900 absolute min-w-60 bottom-full left-0 rounded-lg p-4 z-10">
+  <div :class="props.class" ref="container"
+    class="bg-neutral-900 w-full absolute min-w-60 bottom-full left-0 rounded-t-lg p-4 z-10">
     <ul>
       <li @click="emit('openAddNewShelfCom')"
-        class="flex justify-between items-start hover:bg-neutral-700 py-2 px-1 rounded-lg">
+        class="flex cursor-pointer justify-between items-start hover:bg-neutral-700 py-2 px-1 rounded-lg">
         <p>add new shelf</p>
         <FontAwesomeIcon class="text-lg p-1" :icon="faPlus" />
       </li>
@@ -71,12 +73,12 @@ onUnmounted(() => {
         userBooks.isInShelfGetter(shelf.id, props.book.id)
           ? userBooks.removeBookFromShelf(shelf.id, props.book.id)
           : userBooks.addBookToShelf(shelf.id, props.book)
-        " class="flex justify-between items-start hover:bg-neutral-700 py-2 px-1 rounded-lg" v-for="shelf in shelves"
-        :key="shelf">
+        " class="flex justify-between cursor-pointer items-start hover:bg-neutral-700 py-2 px-1 rounded-lg"
+        v-for="shelf in shelves" :key="shelf">
         <p>{{ shelf.name }}</p>
         <FontAwesomeIcon v-if="userBooks.isInShelfGetter(shelf.id, props.book.id)" class="text-lg text-star p-1"
           :icon="solidBookmark" />
-        <FontAwesomeIcon v-else class="text-lg  p-1" :icon="faBookmark" />
+        <FontAwesomeIcon v-else class="text-lg cursor-pointer p-1" :icon="faBookmark" />
       </li>
     </ul>
   </div>

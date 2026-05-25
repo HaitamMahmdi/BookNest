@@ -1,20 +1,26 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faPen, faBook, faClock, faMessage, faLocation, faCakeCandles, faShare, faHeart, faBookmark, faStar, faUser, faEllipsis, faEllipsisVertical, faCamera, faImage, faUpload, faTrash } from '@fortawesome/free-solid-svg-icons';
-
-import CarouselCom from '../../components/carousel/CarouselCom.vue'
-import SlideCom from '../../components/carousel/SlideCom.vue';
-import BookCardCom from '../../components/bookCard/BookCardCom.vue';
-
-import { useUserBooks } from '../../stores/userBooks';
-import { useUserStore } from '../../stores/userStore';
-import { computed } from 'vue';
+import { faPen, faBook, faClock, faMessage, faLocation, faCakeCandles, faShare, faHeart, faBookmark as solidBookmark, faStar, faUser, faEllipsis, faEllipsisVertical, faCamera, faImage, faUpload, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular, faBookmark } from '@fortawesome/free-regular-svg-icons';
+import CarouselCom from '@/components/carousel/CarouselCom.vue'
+import SlideCom from '@/components/carousel/SlideCom.vue';
+import BookCardCom from '@/components/bookCard/BookCardCom.vue';
+import ShowShelves from '@/components/bookCard/ShowShelves.vue';
+import AddNewShelfCom from "@/components/bookCard/AddNewShelfCom.vue";
+import OptionsCom from '@/components/OptionsCom.vue';
+import { useUserBooks } from '@/stores/userBooks';
+import { useUserStore } from '@/stores/userStore';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useUserAuth } from '../../stores/userAuth';
 
 const userStore = useUserStore()
-const userBooks = useUserBooks()
-
-const { favorites, shelves, reading, reviews } = storeToRefs(userBooks)
+const userBooks = useUserBooks();
+const user = useUserAuth()
+const readingList = computed(() => userBooks.reading)
+const reading = computed(() => readingList.value.length ? readingList.value[readingList.value.length - 1].book : null)
+const showModal = ref(false)
+const showAddNewShelfCom = ref(false);
 </script>
 <template>
     <section class=" text-white  bg-Shark pt-4">
@@ -136,25 +142,49 @@ const { favorites, shelves, reading, reviews } = storeToRefs(userBooks)
                     <h3
                         class="  bg-bg-main max-sm:mx-auto mb-4 hover:bg-bg-secondary rounded-2xl transition w-fit font-semibold text-2xl p-4  ">
                         Books you are reading :</h3>
-                    <article class=" flex  rounded-lg max-sm:flex-wrap  overflow-hidden bg-bg-main ">
+                    <article v-if="reading" class=" flex  rounded-lg max-sm:flex-wrap  overflow-hidden bg-bg-main ">
                         <div class="max-sm:w-full shrink-0 relative overflow-hidden">
+                            <OptionsCom :show-delete="false" :show-edit="false" :show-hide="false"
+                                @finish="userBooks.addToFinishedBooks(reading)"
+                                :show-finish="!userBooks.isFinishedBook(reading.id)"
+                                :container-class="`absolute! top-2  flex items-center justify-center rounded-full right-2`"
+                                button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
+                                :options-list-style="`right-0`" @report="$emit('showInfos')">
+                            </OptionsCom>
                             <span
                                 class="max-sm:w-full -bottom-4 z-10 shadow-[0px_-20px_20px_5px_#00000063] left-0 h-px  absolute "></span>
-                            <img class="min-w-40 max-sm:mx-auto h-full " src="https://picsum.photos/160/240" alt="">
+                            <img class="min-w-40 max-sm:mx-auto h-full "
+                                :src="reading.volumeInfo?.imageLinks?.thumbnail" :alt="reading?.volumeInfo.title">
                         </div>
                         <ul class="p-4 w-full ">
-                            <li class="mb-1 flex justify-between items-center">
-                                <h3 class=" font-semibold">Book title</h3>
-                                <div class=" flex items-center gap-x-1 text-sm">
-                                    <p>3.5/5 </p>
-                                    <FontAwesomeIcon :icon="faStar" class="mr-2 text-star" />
-                                </div>
+                            <li class="mb-4 flex justify-between items-center">
+                                <h3 class=" font-semibold">{{ reading?.volumeInfo.title }}</h3>
+                                <RouterLink :to="{ name: 'Book', params: { id: reading.id } }" target="_blank"
+                                    :class="[reading.volumeInfo.averageRating ? '' : ' font-semibold  transition-colors cursor-pointer hover:text-success']"
+                                    class=" flex items-center gap-x-1 text-sm">
+                                    <p>{{ reading.volumeInfo.averageRating ? reading.volumeInfo.averageRating + `/5`
+                                        : 'Be the first to review' }} </p>
+                                    <FontAwesomeIcon v-if="reading.volumeInfo.averageRating" :icon="faStar"
+                                        class="mr-2 text-star" />
+                                </RouterLink>
                             </li>
                             <li class=" font-semibold mb-4">
-                                <p>Author: John Doe</p>
+                                <div class="flex max-sm:w-fit " v-for="(author, index) in reading?.volumeInfo.authors"
+                                    :key="author">
+                                    <img class="w-7 h-7 rounded-full mr-1"
+                                        :src="`/assets/authors/author${index ? index : ''}.webp`" :alt="author" />
+                                    <p class="text-[14px]">{{ author }}</p>
+                                </div>
                             </li>
+                            <li class="flex flex-wrap mb-4">
+                                <p class="">publisher :</p>
+                                <p class="ml-2 font-normal text-[1rem]">
+                                    {{ reading.volumeInfo.publisher || "Unknown" }}
+                                </p>
+                            </li>
+
                             <li class=" font-semibold flex items-center mb-4  flex-wrap gap-x-2">
-                                <p>Genrea:</p>
+                                <p>Genres:</p>
                                 <p class="bg-amber-300 text-sm px-2 py-0.5 font-semibold w-fit rounded-full">Horrow
                                 </p>
                                 <p class="bg-amber-800 text-sm px-2 py-0.5 font-semibold w-fit rounded-full">Dath
@@ -165,44 +195,58 @@ const { favorites, shelves, reading, reviews } = storeToRefs(userBooks)
                                 .....
                             </li>
                             <li class="  mb-4 flex items-start gap-x-2 flex-wrap">
-                                <p class="font-semibold">Description:</p>
-                                <p class=" max-w-[600px] ml-2">Lorem, ipsum dolor sit amet consectetur adipisicing
-                                    elit.
-                                    Eaque omnis,
-                                    ex quas nemo
-                                    ....</p>
+                                <p class="font-bold text-textLg">description :</p>
+                                <p v-html="reading.volumeInfo?.description?.slice(0, 100) + `...`"
+                                    class="ml-2 max-sm:ml-0">
+                                </p>
                             </li>
-                            <li class=" flex flex-wrap  font-semibold gap-4">
-                                <button
-                                    class="bg-success cursor-pointer transition text-white py-2 px-4 rounded-lg hover:bg-green-600">
+                            <li class=" flex relative flex-wrap  font-semibold gap-4">
+                                <RouterLink target="_blank" title="continue reading"
+                                    class="bg-white text-success w-fit text-center cursor-pointer transition p-2 rounded-lg "
+                                    :to="{ name: 'Book', params: { id: reading.id } }">
                                     <FontAwesomeIcon :icon="faBook" />
-                                    Continue reading
-                                </button>
+                                </RouterLink>
                                 <button
-                                    class="bg-error cursor-pointer transition text-white py-2 px-4 rounded-lg hover:bg-red-600">
-                                    <FontAwesomeIcon :icon="faHeart" />
-                                    Add to Favorites
+                                    :title="userBooks.isInShelfGetter('', reading.id) ? 'Show shelves' : 'Add to shelf'"
+                                    @click="showModal = true"
+                                    :class="[userBooks.isInShelfGetter('', reading.id) ? 'bg-white text-warning ' : 'bg-warning  text-white  hover:bg-amber-700 ']"
+                                    class="cursor-pointer w-fit  transition  p-2  rounded-lg ">
+                                    <FontAwesomeIcon
+                                        :icon="userBooks.isInShelfGetter('', reading.id) ? solidBookmark : faBookmark" />
                                 </button>
+                                <showShelves @close-shelves-com="showModal = false"
+                                    @open-add-new-shelf-com="showAddNewShelfCom = true" :book="reading"
+                                    v-if="showModal"></showShelves>
                                 <button
-                                    class="bg-warning cursor-pointer transition text-white py-2 px-4 rounded-lg hover:bg-amber-700">
-                                    <FontAwesomeIcon :icon="faBookmark" />
-                                    shelfs
-                                </button>
-                                <button
-                                    class="bg-gray-500 cursor-pointer transition text-white py-2 px-4 rounded-lg hover:bg-gray-600">
-                                    <FontAwesomeIcon :icon="faEllipsis" />
-                                    More
+                                    @click="userBooks.isFavorite(reading.id) ? userBooks.removeFromFavorites(reading.id) : userBooks.addToFavorites(reading)"
+                                    :class="[userBooks.isFavorite(reading.id) ? 'bg-white text-error' : 'bg-error text-white  hover:bg-red-600 ']"
+                                    class="bg-error w-fit cursor-pointer transition p-2 rounded-lg">
+
+                                    <FontAwesomeIcon v-if="!userBooks.isFavorite(reading.id)" :icon="faHeartRegular" />
+                                    <FontAwesomeIcon class="" v-else :icon="faHeart" />
                                 </button>
                             </li>
                         </ul>
                     </article>
-                    <button
-                        class=" w-full p-4 text-center font-semibold bg-bg-main mt-4 rounded-2xl cursor-pointer hover:bg-gray-700 transition">
-                        <p>See
-                            all <span class="text-[#ddd]">(12)</span></p>
-                    </button>
+                    <RouterLink v-if="userBooks.reading.length > 1"
+                        :to="{ name: 'CurrentlyReading', params: { id: user.user.uid } }"
+                        class="w-full block p-4 text-center font-semibold bg-bg-main mt-4 rounded-2xl cursor-pointer hover:bg-gray-700 transition">
+                        <p>
+                            See all <span class="text-[#ddd]">({{ userBooks.reading.length }})</span>
+                        </p>
+                    </RouterLink>
+                    <div class=" w-full container mx-auto flex items-top justify-center bg-Shark text-white py-8"
+                        v-else>
+                        <RouterLink class="text-2xl text-center hover:text-success font-bold  transition-colors" to="/">
+                            <FontAwesomeIcon class="text-4xl p-1" :icon="faBook" />
+
+                            <p>Start reading Now</p>
+
+                        </RouterLink>
+
+                    </div>
                 </div>
-                <div class="mt-4   ">
+                <div class="mt-4">
                     <h3
                         class="  bg-bg-main  max-sm:mx-auto mb-4 hover:bg-bg-secondary  rounded-2xl transition w-fit font-semibold text-2xl p-4  ">
                         Favorite authors :</h3>
@@ -240,14 +284,15 @@ const { favorites, shelves, reading, reviews } = storeToRefs(userBooks)
 
                 </div>
 
-                <div class="mt-4">
+                <div class="mt-8 ">
+                    <!-- !TODO: Improve carousel display -->
                     <h3
                         class="  bg-bg-main max-sm:mx-auto mb-4 hover:bg-bg-secondary rounded-2xl transition w-fit font-semibold text-2xl p-4  ">
                         Finished books :</h3>
-                    <div v-if="false">
+                    <div v-if="userBooks.finishedBooks.length">
                         <CarouselCom :items-per-view="4" :show-arrows="true">
-                            <SlideCom v-for="x in 10" :key="x">
-                                <BookCardCom :book="bookObj"></BookCardCom>
+                            <SlideCom v-for="book in userBooks.finishedBooks" :key="book.id">
+                                <BookCardCom :book="book.book"></BookCardCom>
                             </SlideCom>
 
                         </CarouselCom>
@@ -257,6 +302,8 @@ const { favorites, shelves, reading, reviews } = storeToRefs(userBooks)
             </section>
 
         </div>
+        <AddNewShelfCom @close="showAddNewShelfCom = false" v-if="showAddNewShelfCom"></AddNewShelfCom>
+
     </section>
 
 </template>

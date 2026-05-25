@@ -13,17 +13,19 @@ export const useUserBooks = defineStore(`userBooks`, {
     unsubscribe: null,
   }),
   getters: {
-    /* Checks if a book is in the user's favorites list */
+    /*
+     * Checks if a book is in the user's favorites list */
     isFavorite: (state) => (bookId) => {
+      console.log(bookId);
       return state.favorites.some((book) => book.id === bookId);
     },
-    /** Checks if a book is in a specific shelf or in any shelf if no shelfID is provided
+    /*
+     * Checks if a book is in a specific shelf or in any shelf if no shelfID is provided
      * @param {string} shelfID - The ID of the shelf to check. If not provided, checks all shelves.
      * @param {string} bookID - The ID of the book to check for.
      * @returns {boolean} - Returns true if the book is found in the specified shelf or any shelf, false otherwise.
      */
     isInShelfGetter: (state) => (shelfID, bookID) => {
-      console.log(state.shelves);
       const shelf = state.shelves.find((s) => s.id === shelfID);
       if (shelf) {
         return shelf.books.some((book) => book.id === bookID);
@@ -37,12 +39,16 @@ export const useUserBooks = defineStore(`userBooks`, {
         }
       }
     },
+    /* Checks if a book is finished
+     * @param {string} bookID - the Id of the book
+     * @returns {boolean} true if the book is finished or false if it is not
+     */
     isFinishedBook: (state) => (bookID) => {
-      return state.finishedBooks.some((id) => id === bookID);
+      return state.finishedBooks.some((book) => book.book.id === bookID);
     },
   },
   actions: {
-    /**
+    /*
      * Adds a book to the user's favorites list in Firestore.
      * @param {object} book - The book object to be saved. Should have an 'id' property.
      * @returns {Promise<void>} - Resolves when the update is complete.
@@ -57,7 +63,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         favorites: arrayUnion(book),
       });
     },
-    /**
+    /*
      * Removes a book from the user's favorites list in Firestore.
      * @param {string} bookId - The ID of the book to remove from favorites.
      * @returns {Promise<void>} - Resolves when the update is complete.
@@ -68,12 +74,13 @@ export const useUserBooks = defineStore(`userBooks`, {
         return;
       }
       this.favorites = this.favorites.filter((book) => book.id !== bookId);
+      console.log(this.favorites);
       const userRef = doc(db, `users`, authStore.user.uid);
       await updateDoc(userRef, {
         favorites: this.favorites,
       });
     },
-    /**
+    /*
      * Loads the user's books data from Firestore and sets up a real-time listener.
      * Updates favorites, shelves, and reading arrays.
      * @returns {Promise<void>} - Resolves when the initial load is complete.
@@ -101,7 +108,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         }
       });
     },
-    /**
+    /*
      * Stops the real-time listener for user books data.
      * @returns {void}
      */
@@ -111,7 +118,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         this.unsubscribe = null;
       }
     },
-    /**
+    /*
      * Creates a new shelf with the given name and adds it to the user's shelves in Firestore.
      * @param {string} shelfName - The name of the new shelf to create.
      * @returns {Promise<void>} - Resolves when the update is complete.
@@ -129,7 +136,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         shelves: this.shelves,
       });
     },
-    /**
+    /*
      * Adds a new shelf with the given name to the user's shelves in Firestore.
      * @param {string} shelfName - The name of the new shelf to add.
      * @returns {Promise<void>} - Resolves when the update is complete.
@@ -149,7 +156,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         shelves: this.shelves,
       });
     },
-    /**
+    /*
      * Adds a book to a specific shelf in the user's shelves in Firestore.
      * @param {string} shelfID - The ID of the shelf to add the book to.
      * @param {object} book - The book object to add to the shelf. Should have an 'id' property.
@@ -173,7 +180,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         });
       }
     },
-    /**
+    /*
      * Removes a book from a specific shelf in the user's shelves in Firestore.
      * @param {string} shelfID - The ID of the shelf to remove the book from.
      * @param {string} bookId - The ID of the book to remove from the shelf.
@@ -199,7 +206,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         });
       }
     },
-    /**
+    /*
      * add a review to a book .
      * @param {string} bookID - The ID of the book to add the review to
      * @param {object} review - an object that contains (title, body, rating, date) of the review
@@ -219,7 +226,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       });
     },
 
-    /**
+    /*
      * remove a review from the user's reviews list.
      * @param {string} reviewID - The ID of the review to remove
      * @returns {Promise<void>} - Resolves when the update is complete.
@@ -236,39 +243,37 @@ export const useUserBooks = defineStore(`userBooks`, {
       });
     },
 
-    /**
+    /*
      * update reading progress or add a new progress entry for a book.
-     * @param {string} bookID - The ID of the book
+     * @param {object} bookObj - The book object
      * @param {object} progObj - object containing (progress, thought)
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
-    async updateProgress(bookID, progObj) {
+    async updateProgress(bookObj, progObj) {
       const authStore = useUserAuth();
       if (!authStore.user) {
         return;
       }
       const userRef = doc(db, `users`, authStore.user.uid);
-
       let book;
       for (const read of this.reading) {
-        if (read.id === bookID) {
+        console.log(read);
+        if (read.book.id === bookObj.id) {
           book = read;
         }
       }
-
       const date = new Date();
-
       if (book) {
-        book.reading.push({
+        book.thoughts.push({
           id: crypto.randomUUID(),
           progress: progObj.progress,
           thought: progObj.thought,
-          date: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`, // fixed getDay -> getDate
+          date: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
         });
       } else {
         this.reading.push({
-          id: bookID,
-          reading: [
+          book: bookObj,
+          thoughts: [
             {
               id: crypto.randomUUID(),
               progress: progObj.progress,
@@ -278,13 +283,14 @@ export const useUserBooks = defineStore(`userBooks`, {
           ],
         });
       }
-
       await updateDoc(userRef, {
         reading: this.reading,
       });
     },
-
-    /**
+    isReading(bookID) {
+      return this.reading.some((book) => book.book.id === bookID);
+    },
+    /*
      * delete a specific thought (progress entry) from a book.
      * @param {string} bookID - The ID of the book
      * @param {string} thoughtID - The ID of the thought to delete
@@ -310,29 +316,56 @@ export const useUserBooks = defineStore(`userBooks`, {
       });
     },
 
-    /**
-     * add a book to the finished books list.
+    /*
+     * add a book to the finished books list. and remove it reading progress from reading if it exist and add it to the FinishedObj
      * @param {string} bookID - The ID of the book to add
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
-    async addToFinishedBooks(bookID) {
+    async addToFinishedBooks(book) {
       const authStore = useUserAuth();
       if (!authStore.user) {
         return;
       }
       const userRef = doc(db, `users`, authStore.user.uid);
-
-      this.finishedBooks.push(bookID);
-
-      await updateDoc(userRef, {
-        finishedBooks: this.finishedBooks,
-      });
+      const isReading = this.isReading(book.id);
+      if (isReading) {
+        const readingRecord = this.reading.find(
+          (record) => record.book.id === book.id,
+        );
+        const thoughts = readingRecord?.thoughts || [];
+        const finishedBookObj = { book: book, thoughts: thoughts };
+        const updatedReadingObj = this.reading.filter(
+          (record) => record.book.id !== book.id,
+        );
+        const updatedFinishedObj = [...this.finishedBooks, finishedBookObj];
+        try {
+          await updateDoc(userRef, {
+            reading: updatedReadingObj,
+            finishedBooks: updatedFinishedObj,
+          });
+          this.reading = updatedReadingObj;
+          this.finishedBooks = updatedFinishedObj;
+        } catch (error) {
+          console.error("Failed to update finished books:", error);
+        }
+      } else {
+        const finishedBookObj = { book: book, thoughts: [] };
+        const updatedFinishedObj = [...this.finishedBooks, finishedBookObj];
+        try {
+          await updateDoc(userRef, {
+            finishedBooks: updatedFinishedObj,
+          });
+          this.finishedBooks = updatedFinishedObj;
+        } catch (error) {
+          console.error("Failed to update finished books:", error);
+        }
+      }
     },
-
     /**
-     * remove a book from the finished books list.
-     * @param {string} bookID - The ID of the book to remove
-     * @returns {Promise<void>} - Resolves when the update is complete.
+     * !TODO: Update the delete from finishedBooks action
+     ** remove a book from the finished books list.
+     ** @param {string} bookID - The ID of the book to remove
+     ** @returns {Promise<void>} - Resolves when the update is complete.
      */
     async deleteFinishedBook(bookID) {
       const authStore = useUserAuth();
@@ -342,7 +375,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       const userRef = doc(db, `users`, authStore.user.uid);
 
       this.finishedBooks = this.finishedBooks.filter(
-        (book) => book !== bookID, // fixed missing return
+        (book) => book.book.id !== bookID,
       );
 
       await updateDoc(userRef, {
