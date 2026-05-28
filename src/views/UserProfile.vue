@@ -16,14 +16,12 @@ import { nextTick } from 'vue';
 import { useUserBooks } from '@/stores/userBooks';
 import { useUserAuth } from '@/stores/userAuth';
 import { useUserStore } from '@/stores/userStore';
-import { useMessageStore } from '@/stores/MessageStore.js';
 import { useRoute } from 'vue-router';
 
 import ChangeCoverModal from '@/components/modals/ChangeCoverModal.vue';
 import ChoseImageModal from '@/components/modals/ChoseImageModal.vue';
 import LoadingCom from '@/components/LoadingCom.vue';
 import { RouterView } from 'vue-router';
-const messageStore = useMessageStore()
 const userStore = useUserStore();
 const coverUrl = computed(() => userStore.coverURL)
 const profileUrl = computed(() => userStore.profileImgURL)

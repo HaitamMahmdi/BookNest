@@ -37,6 +37,7 @@ const hide = ref(false);
           :key="star" :icon="faStar" />
       </div>
       <OptionsCom :options-list-style="`right-0 top-3/6!`" :show-delete="props.isUserReview"
+        @delete="userBooks.removeReview(props.reviewID)" :show-hide="!props.isUserReview"
         :show-edit="props.isUserReview" :show-finish="false" :show-report="!props.isUserReview"
         @hide="() => hide = true"></OptionsCom>
     </div>

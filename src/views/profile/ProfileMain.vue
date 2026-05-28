@@ -297,7 +297,7 @@ const showAddNewShelfCom = ref(false);
                             </SlideCom>
 
                         </CarouselCom>
-                        <BookCardCom :book="userBooks.finishedBooks[0]?.book">
+                        <BookCardCom v-if="userBooks.finishedBooks.length < 1" :book="userBooks.finishedBooks[0]?.book">
                         </BookCardCom>
                     </div>
                 </div>

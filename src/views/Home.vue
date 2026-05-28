@@ -5,7 +5,6 @@ import { faDragon, faRobot, faGhost, faLandmark } from "@fortawesome/free-solid-
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { useUserBooks } from "../stores/userBooks";
 import LoadingCom from "../components/LoadingCom.vue";
-import MessageModal from "../components/modals/MessageModal.vue";
 const userBooks = useUserBooks();
 const books = ref({});
 
@@ -26,8 +25,6 @@ const bookDetail = ref(null);
 <template>
   <LoadingCom v-if="!books"></LoadingCom>
   <div v-if="books">
-    <MessageModal></MessageModal>
-
     <section class="min-h-screen  mt-10">
       <ul class=" text-text-main flex flex-wrap h-fit gap-6 mb-8 w-full select-none justify-center  max-sm:text-sm">
         <li @click="() => filterBooks === 'fantasy' ? filterBooks = '' : filterBooks = 'fantasy'"

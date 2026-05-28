@@ -117,7 +117,7 @@ body.modal-open {
 }
 
 body::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
   background-color: var(--color-bg-main);
 }
 body::-webkit-scrollbar-thumb {

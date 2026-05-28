@@ -3,8 +3,9 @@ import { onMounted, onUnmounted, reactive, ref, useTemplateRef } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useUserBooks } from "@/stores/userBooks";
+import { useMessageStore } from "@/stores/MessageStore";
 import { useClickOutside } from "@/composables/useClickOutside";
-const emit = defineEmits(['submit', 'close'])
+const emit = defineEmits(['close'])
 const props = defineProps({
   show: Boolean,
   bookID: {
@@ -13,6 +14,7 @@ const props = defineProps({
   },
 });
 const userBooks = useUserBooks()
+const messageStore = useMessageStore()
 const star = ref([null]);
 const reviewObj = reactive({
   title: "",
@@ -23,12 +25,11 @@ const reviewObj = reactive({
 const errorMessage = ref("");
 const container = ref(null)
 useClickOutside(container, () => {
-  props.show = false
   container.value.reset
+  messageStore.dismissMessage()
   emit('close')
 })
 const changeStare = (e) => {
-  errorMessage.value = ''
   const starId = e.target.closest("svg").id;
   const starIndex = parseInt(starId.replace("star", ""));
   for (let i = 0; i < star.value.length; i++) {
@@ -42,14 +43,13 @@ const changeStare = (e) => {
 };
 const addNewReview = async () => {
   if (!reviewObj.title || !reviewObj.body || reviewObj.rating === 0) {
-    errorMessage.value = "Please fill in all required fields and select a star rating";
+    messageStore.updateMessage("Please fill in all required fields and select a star rating", "error");
     return;
   }
   const date = new Date()
-  reviewObj.date = `${date.getFullYear}-${date.getMonth}-${date.getDay}`
+  reviewObj.date = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
   await userBooks.addNewReview(props.bookID, reviewObj);
-  errorMessage.value = "";
-  emit('submitReview')
+  emit('close')
 }
 </script>
 <template>

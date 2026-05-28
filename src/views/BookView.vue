@@ -105,18 +105,12 @@ watch(
         */
   },
 );
-
 onBeforeUnmount(() => {
   document.title = `BookNest`;
 
 })
-
 const showModal = ref(false)
 const showAddNewShelfCom = ref(false)
-
-const submitReview = async (bookID) => {
-  await userBooks.addNewReview(bookID)
-}
 </script>
 <template>
 
@@ -274,7 +268,7 @@ const submitReview = async (bookID) => {
           <p id="part" class="group-hover:underline">add your review</p>
         </button>
         <AddReviewCom :bookID="book.id" :show="showAddReviewCom" @close="showAddReviewCom = false"
-          v-if="showAddReviewCom" ref="addReviewCom" @submitReview="submitReview" />
+          v-if="showAddReviewCom" ref="addReviewCom" />
 
         <div class="slider flex overflow-x-scroll w-full mt-8 mx-auto">
           <ReviewBoxCom v-if="userReview" :class="`min-w-[300px] bg-blue-600 mx-auto `" :obj="{
