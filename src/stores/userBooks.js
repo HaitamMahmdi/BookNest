@@ -3,6 +3,7 @@ import { useUserAuth } from "./userAuth";
 import { useUserStore } from "./userStore";
 import { doc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
+import { useMessageStore } from "./MessageStore";
 export const useUserBooks = defineStore(`userBooks`, {
   state: () => ({
     favorites: [],
@@ -119,29 +120,12 @@ export const useUserBooks = defineStore(`userBooks`, {
       }
     },
     /*
-     * Creates a new shelf with the given name and adds it to the user's shelves in Firestore.
-     * @param {string} shelfName - The name of the new shelf to create.
-     * @returns {Promise<void>} - Resolves when the update is complete.
-     */
-    async createShelves(shelfName) {
-      this.shelves.push({
-        name: shelfName,
-        books: [],
-        id: crypto.randomUUID(),
-      });
-      const authStore = useUserAuth();
-      if (!authStore.user) return;
-      const userRef = doc(db, `users`, authStore.user.uid);
-      await updateDoc(userRef, {
-        shelves: this.shelves,
-      });
-    },
-    /*
      * Adds a new shelf with the given name to the user's shelves in Firestore.
      * @param {string} shelfName - The name of the new shelf to add.
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
     async addNewShelf(shelfName) {
+      const messageStore = useMessageStore();
       const authStore = useUserAuth();
       if (!authStore.user) {
         return;
@@ -151,10 +135,17 @@ export const useUserBooks = defineStore(`userBooks`, {
         books: [],
         id: crypto.randomUUID(),
       });
-      const userRef = doc(db, `users`, authStore.user.uid);
-      await updateDoc(userRef, {
-        shelves: this.shelves,
-      });
+      try {
+        const userRef = doc(db, `users`, authStore.user.uid);
+        await updateDoc(userRef, {
+          shelves: this.shelves,
+        });
+        messageStore.updateMessage("Shelf created successfully!", "success");
+      } catch (error) {
+        console.error("Error creating shelf:", error);
+        messageStore.updateMessage("Error creating shelf!", "error");
+        return;
+      }
     },
     /*
      * Adds a book to a specific shelf in the user's shelves in Firestore.
@@ -214,16 +205,26 @@ export const useUserBooks = defineStore(`userBooks`, {
      */
     async addNewReview(bookID, review) {
       const authStore = useUserAuth();
-      if (!authStore.user || typeof review !== "object") {
+      const messageStore = useMessageStore();
+      if (!authStore.user) {
+        messageStore.updateMessage(
+          "Failed to add review. Please try again.",
+          "error",
+        );
         return;
       }
-      const userRef = doc(db, `users`, authStore.user.uid);
-
-      review.id = crypto.randomUUID();
-      review.bookID = bookID;
-      await updateDoc(userRef, {
-        reviews: arrayUnion(review),
-      });
+      try {
+        const userRef = doc(db, `users`, authStore.user.uid);
+        review.id = crypto.randomUUID();
+        review.bookID = bookID;
+        await updateDoc(userRef, {
+          reviews: arrayUnion(review),
+        });
+        messageStore.updateMessage("Review added successfully!", "success");
+      } catch (error) {
+        console.error("Error adding review:", error);
+        messageStore.updateMessage("Error adding review!", "error");
+      }
     },
 
     /*
@@ -233,14 +234,22 @@ export const useUserBooks = defineStore(`userBooks`, {
      */
     async removeReview(reviewID) {
       const authStore = useUserAuth();
+      const messageStore = useMessageStore();
+
       if (!authStore.user) {
         return;
       }
-      this.reviews = this.reviews.filter((review) => review.id !== reviewID);
-      const userRef = doc(db, `users`, authStore.user.uid);
-      await updateDoc(userRef, {
-        reviews: this.reviews,
-      });
+      try {
+        this.reviews = this.reviews.filter((review) => review.id !== reviewID);
+        const userRef = doc(db, `users`, authStore.user.uid);
+        await updateDoc(userRef, {
+          reviews: this.reviews,
+        });
+        messageStore.updateMessage("Review deleted successfully!", "success");
+      } catch (error) {
+        console.error("Error deleting review:", error);
+        messageStore.updateMessage("Error deleting review!", "error");
+      }
     },
 
     /*
@@ -297,23 +306,28 @@ export const useUserBooks = defineStore(`userBooks`, {
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
     async deleteThought(bookID, thoughtID) {
+      const messageStore = useMessageStore();
       const authStore = useUserAuth();
       if (!authStore.user) {
         return;
       }
-      const userRef = doc(db, `users`, authStore.user.uid);
-
-      this.reading = this.reading.map((book) => {
-        if (book.id !== bookID) return book;
-        return {
-          ...book,
-          reading: book.reading.filter((thought) => thought.id !== thoughtID),
-        };
-      });
-
-      await updateDoc(userRef, {
-        reading: this.reading,
-      });
+      try {
+        const userRef = doc(db, `users`, authStore.user.uid);
+        this.reading = this.reading.map((book) => {
+          if (book.id !== bookID) return book;
+          return {
+            ...book,
+            reading: book.reading.filter((thought) => thought.id !== thoughtID),
+          };
+        });
+        await updateDoc(userRef, {
+          reading: this.reading,
+        });
+        messageStore.updateMessage("Thought deleted successfully!", "success");
+      } catch (error) {
+        console.error("Error deleting thought:", error);
+        messageStore.updateMessage("Error deleting thought!", "error");
+      }
     },
 
     /*
@@ -327,6 +341,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         return;
       }
       const userRef = doc(db, `users`, authStore.user.uid);
+      const messageStore = useMessageStore();
       const isReading = this.isReading(book.id);
       if (isReading) {
         const readingRecord = this.reading.find(
@@ -345,8 +360,13 @@ export const useUserBooks = defineStore(`userBooks`, {
           });
           this.reading = updatedReadingObj;
           this.finishedBooks = updatedFinishedObj;
+          messageStore.updateMessage("this Book is finished!", "success");
         } catch (error) {
           console.error("Failed to update finished books:", error);
+          messageStore.updateMessage(
+            "Failed to update finished books!",
+            "error",
+          );
         }
       } else {
         const finishedBookObj = { book: book, thoughts: [] };
@@ -356,8 +376,13 @@ export const useUserBooks = defineStore(`userBooks`, {
             finishedBooks: updatedFinishedObj,
           });
           this.finishedBooks = updatedFinishedObj;
+          messageStore.updateMessage("this Book is finished!", "success");
         } catch (error) {
           console.error("Failed to update finished books:", error);
+          messageStore.updateMessage(
+            "Failed to update finished books!",
+            "error",
+          );
         }
       }
     },
