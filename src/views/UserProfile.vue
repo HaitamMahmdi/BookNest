@@ -10,19 +10,20 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEllipsis, faCamera, faImage, faUpload, faSortDown } from '@fortawesome/free-solid-svg-icons';
-import OptionsCom from '../components/OptionsCom.vue';
-import { useScrollLock } from '../composables/useScrollControl';
+import OptionsCom from '@/components/OptionsCom.vue';
+import { useScrollLock } from '@/composables/useScrollControl';
 import { nextTick } from 'vue';
-import { useUserBooks } from '../stores/userBooks';
-import { useUserAuth } from '../stores/userAuth';
-import { useUserStore } from '../stores/userStore';
+import { useUserBooks } from '@/stores/userBooks';
+import { useUserAuth } from '@/stores/userAuth';
+import { useUserStore } from '@/stores/userStore';
+import { useMessageStore } from '@/stores/MessageStore.js';
 import { useRoute } from 'vue-router';
 
-import ChangeCoverModal from '../components/modals/ChangeCoverModal.vue';
-import MessageModal from '../components/modals/MessageModal.vue';
-import ChoseImageModal from '../components/modals/ChoseImageModal.vue';
-import LoadingCom from '../components/LoadingCom.vue';
+import ChangeCoverModal from '@/components/modals/ChangeCoverModal.vue';
+import ChoseImageModal from '@/components/modals/ChoseImageModal.vue';
+import LoadingCom from '@/components/LoadingCom.vue';
 import { RouterView } from 'vue-router';
+const messageStore = useMessageStore()
 const userStore = useUserStore();
 const coverUrl = computed(() => userStore.coverURL)
 const profileUrl = computed(() => userStore.profileImgURL)
@@ -55,20 +56,9 @@ watch(
 const messageText = ref('')
 const messageType = ref('')
 const showChoseModal = ref(0)
-const showMessageModal = ref(false);
 const isSettingCoverImg = ref(false)
 const isSettingProfileImg = ref(false)
-const showMessage = (text, type) => {
-    messageText.value = text
-    messageType.value = type
 
-    showMessageModal.value = false
-    messageKey.value++
-
-    nextTick(() => {
-        showMessageModal.value = true
-    })
-}
 const imageValidator = (type, file) => {
     const allowedTypes = ["image/png", "image/jpeg", "image/webp"]
     if (!file) {
@@ -76,7 +66,7 @@ const imageValidator = (type, file) => {
         return false
     }
     if (!allowedTypes.includes(file.type)) {
-        showMessage('Please upload a valid image file (PNG, JPEG, WebP)', 'error')
+        messageStore.updateMessage('Please upload a valid image file (PNG, JPEG, WebP)', 'error')
         return false
     }
     const url = URL.createObjectURL(file)
@@ -84,14 +74,12 @@ const imageValidator = (type, file) => {
     img.onload = () => {
         if (type === 'cover') {
             if (img.width < 400 || img.height < 150) {
-                showMessage('Image dimensions must be at least 400x150 pixels', 'error')
                 URL.revokeObjectURL(url)
                 return false
             }
 
         } else {
             if (img.width < 180 || img.height < 180) {
-                showMessage('Image dimensions must be at least 180x180 pixels', 'error')
                 URL.revokeObjectURL(url)
                 return false
             }
@@ -114,17 +102,11 @@ const handleFile = (type, event) => {
     img.src = url
     selectedFile.value = file
 }
-
 const setNewCover = async () => {
     if (selectedFile.value) {
         isSettingCoverImg.value = true
         const success = await userStore.updateProfileMedia(selectedFile.value, "cover")
-        if (success) {
-            showMessage('Cover image updated successfully', 'success')
-            previewUrl.coverUrl = null
-        } else {
-            showMessage('Failed to update cover image. Please try again.', 'error')
-        }
+        previewUrl.coverUrl = null
         isSettingCoverImg.value = false
     }
 }
@@ -132,42 +114,24 @@ const setNewProfileImg = async () => {
     if (selectedFile.value) {
         isSettingProfileImg.value = true
         const success = await userStore.updateProfileMedia(selectedFile.value, "profile")
-        if (success) {
-            showMessage('Profile image updated successfully', 'success')
-            previewUrl.profileUrl = null
-        } else {
-            showMessage('Failed to update profile image. Please try again.', 'error')
-        }
+        previewUrl.profileUrl = null
         isSettingProfileImg.value = false
     }
 }
-
 const imgSelectedForProfile = async (id) => {
     isSettingProfileImg.value = true
     const success = await userStore.changeProfileMedia(id)
-    if (success) {
-        showMessage('Profile image updated successfully', 'success')
-    } else {
-        showMessage('Failed to update profile image. Please try again.', 'error')
-    }
     isSettingProfileImg.value = false
 }
 const imgSelectedForCover = async (id) => {
     isSettingCoverImg.value = true
     const success = await userStore.changeCoverMedia(id)
-    if (success) {
-        showMessage('Cover image updated successfully', 'success')
-    } else {
-        showMessage('Failed to update cover image. Please try again.', 'error')
-    }
     isSettingCoverImg.value = false
 }
 </script>
 <template>
     <div class=" text-white">
-        <MessageModal :key="messageKey" :type="messageType" enters-from="top" :message="messageText"
-            :show-message="showMessageModal" @close="showMessageModal = false">
-        </MessageModal>
+
         <section class="profileOverView ">
             <div class="relative">
                 <div class="w-full  aspect-3/1  flex justify-center bg-Shark max-lg:h-75 max-h-[390px] relative">

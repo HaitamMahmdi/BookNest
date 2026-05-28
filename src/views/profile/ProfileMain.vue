@@ -289,14 +289,16 @@ const showAddNewShelfCom = ref(false);
                     <h3
                         class="  bg-bg-main max-sm:mx-auto mb-4 hover:bg-bg-secondary rounded-2xl transition w-fit font-semibold text-2xl p-4  ">
                         Finished books :</h3>
-                    <div v-if="userBooks.finishedBooks.length">
-                        <CarouselCom :items-per-view="4" :show-arrows="true">
+                    <div>
+
+                        <CarouselCom v-if="userBooks.finishedBooks.length > 1" :items-per-view="4" :show-arrows="true">
                             <SlideCom v-for="book in userBooks.finishedBooks" :key="book.id">
                                 <BookCardCom :book="book.book"></BookCardCom>
                             </SlideCom>
 
                         </CarouselCom>
-
+                        <BookCardCom :book="userBooks.finishedBooks[0]?.book">
+                        </BookCardCom>
                     </div>
                 </div>
             </section>

@@ -50,7 +50,7 @@ const categories = () => {
 }
 </script>
 <template>
-  <article :class="[props.class]" class="w-60 flex flex-col justify-between relative text-white ">
+  <article v-if="props.book" :class="[props.class]" class="w-60 flex flex-col justify-between relative text-white ">
     <div class="header overflow-hidden ">
       <div>
         <div class="relative bg-bg-secondary/40 rounded-t-lg overflow-hidden  py-2">
@@ -62,13 +62,13 @@ const categories = () => {
             </p>
             <p v-if="isFinished && !readingProgress.progress">RP: 100%</p>
           </div>
-          <img class="w-40 h-60 object-cover rounded-md mx-auto" :src="props.book?.volumeInfo.imageLinks?.thumbnail ||
+          <img class="w-40 h-60 object-cover rounded-md mx-auto" :src="props.book?.volumeInfo?.imageLinks?.thumbnail ||
             '/assets/backGrounds/authBackGround.svg'
             " :alt="props.book?.volumeInfo.title" />
           <span class="w-full -bottom-4 z-10 shadow-[0px_-20px_20px_5px_#00000063] left-0 h-px  absolute "></span>
           <OptionsCom :show-delete="isInShelf || isFavorite || isReading || isFinished" :show-edit="false"
             :show-hide="!isInShelf && !isFavorite && !isReading && !isFinished"
-            @finish="userBooks.addToFinishedBooks(props.book.id)" :show-finish="!isFinished"
+            @finish="userBooks.addToFinishedBooks(props.book)" :show-finish="!isFinished"
             :container-class="`absolute! top-2  flex items-center justify-center rounded-full right-2`"
             button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
             :options-list-style="`right-0`" :book="props.book" @report="$emit('showInfos')">

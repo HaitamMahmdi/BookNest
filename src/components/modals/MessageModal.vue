@@ -2,20 +2,9 @@
 import { faStop, faCheckCircle, faExclamationTriangle, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { ref } from 'vue';
-const emit = defineEmits(['close'])
+import { useMessageStore } from '@/stores/MessageStore';
+const messageStore = useMessageStore()
 const props = defineProps({
-    showMessage: {
-        type: Boolean,
-        default: false,
-    },
-    message: {
-        type: String,
-        required: true,
-    },
-    type: {
-        type: String,
-        required: true,
-    },
     entersFrom: {
         type: String,
         defaulted: 'top',
@@ -23,27 +12,23 @@ const props = defineProps({
 })
 const message = ref(null)
 const dismissMessage = () => {
-    if (!message.value) return
     message.value.classList.replace('enterFromTop', 'exitToTop');
     setTimeout(() => {
-        emit('close')
+        messageStore.dismissMessage()
     }, 300)
 }
 
 </script>
 <template>
     <div>
-        <div @click="dismissMessage" ref="message" v-if="props.showMessage"
-            :class="[props.type === 'error' ? 'font-semibold bg-error text-white' : props.type === 'success' ? 'bg-success text-white' : 'bg-warning text-white']"
-            class=" flex   items-center justify-center cursor-pointer text-lg max-sm:w-full max-sm:px-2   min-w-2xs py-3 px-4 rounded-full gap-x-2 absolute  left-1/2 -translate-x-1/2 shadow-lg z-1000 enterFromTop">
-            <FontAwesomeIcon class="mt-px "
-                :icon="props.type === 'error' ? faXmarkCircle : props.type === 'success' ? faCheckCircle : faExclamationTriangle" />
-            <p> {{ props.message }}</p>
-
+        <div v-if="messageStore.messageText" @click="dismissMessage" ref="message"
+            :class="[messageStore.messageType === 'error' ? 'font-semibold bg-error text-white' : messageStore.messageType === 'success' ? 'bg-success text-white' : 'bg-warning text-white']"
+            class=" flex items-center justify-center cursor-pointer max-sm:w-full max-sm:px-2   min-w-2xs py-3 px-4 rounded-full gap-x-2 absolute  left-1/2 -translate-x-1/2 shadow-lg z-1000 enterFromTop">
+            <FontAwesomeIcon class="mt-px"
+                :icon="messageStore.messageType === 'error' ? faXmarkCircle : messageStore.messageType === 'success' ? faCheckCircle : faExclamationTriangle" />
+            <p> {{ messageStore.messageText }}</p>
         </div>
     </div>
-
-
 </template>
 
 <style scoped>
