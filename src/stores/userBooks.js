@@ -56,13 +56,19 @@ export const useUserBooks = defineStore(`userBooks`, {
      */
     async addToFavorites(book) {
       const authStore = useUserAuth();
+      const uiStore = useUiStore();
       if (!authStore.user) {
         return;
       }
-      const userRef = doc(db, `users`, authStore.user.uid);
-      await updateDoc(userRef, {
-        favorites: arrayUnion(book),
-      });
+      try {
+        const userRef = doc(db, `users`, authStore.user.uid);
+        await updateDoc(userRef, {
+          favorites: arrayUnion(book),
+        });
+      } catch (error) {
+        uiStore.showMessageModal("Error adding to favorites", "error");
+        console.error("Error adding to favorites:", error);
+      }
     },
     /*
      * Removes a book from the user's favorites list in Firestore.
@@ -71,15 +77,22 @@ export const useUserBooks = defineStore(`userBooks`, {
      */
     async removeFromFavorites(bookId) {
       const authStore = useUserAuth();
+      const uiStore = useUiStore();
       if (!authStore.user) {
         return;
       }
-      this.favorites = this.favorites.filter((book) => book.id !== bookId);
-      console.log(this.favorites);
-      const userRef = doc(db, `users`, authStore.user.uid);
-      await updateDoc(userRef, {
-        favorites: this.favorites,
-      });
+      const oldFav = this.favorites;
+      try {
+        this.favorites = this.favorites.filter((book) => book.id !== bookId);
+        const userRef = doc(db, `users`, authStore.user.uid);
+        await updateDoc(userRef, {
+          favorites: this.favorites,
+        });
+      } catch (error) {
+        this.favorites = oldFav;
+        console.error("Error removing from favorites:", error);
+        uiStore.showMessageModal("Error removing from favorites!", "error");
+      }
     },
     /*
      * Loads the user's books data from Firestore and sets up a real-time listener.
@@ -130,6 +143,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       if (!authStore.user) {
         return;
       }
+      const oldShelves = this.shelves;
       this.shelves.push({
         name: shelfName,
         books: [],
@@ -140,10 +154,11 @@ export const useUserBooks = defineStore(`userBooks`, {
         await updateDoc(userRef, {
           shelves: this.shelves,
         });
-        uiStore.showMessageModal("Shelf created successfully!", "success");
+        uiStore.showMessageModal("Shelf created successfully", "success");
       } catch (error) {
+        this.shelves = oldShelves;
         console.error("Error creating shelf:", error);
-        uiStore.showMessageModal("Error creating shelf!", "error");
+        uiStore.showMessageModal("Error creating shelf", "error");
         return;
       }
     },
@@ -155,20 +170,29 @@ export const useUserBooks = defineStore(`userBooks`, {
      */
     async addBookToShelf(shelfID, book) {
       const authStore = useUserAuth();
+      const uiStore = useUiStore();
       if (!authStore.user) {
         return;
       }
-      const shelf = this.shelves.find((s) => s.id === shelfID);
+      const shelf = shelfID ? this.shelves.find((s) => s.id === shelfID) : null;
       const isIn = this.isInShelfGetter(shelfID, book.id);
       if (isIn) {
         return;
       }
       if (shelf) {
-        shelf.books.push(book);
-        const userRef = doc(db, `users`, authStore.user.uid);
-        await updateDoc(userRef, {
-          shelves: this.shelves,
-        });
+        const oldShelves = this.shelves;
+        try {
+          shelf.books.push(book);
+          const userRef = doc(db, `users`, authStore.user.uid);
+          await updateDoc(userRef, {
+            shelves: this.shelves,
+          });
+          uiStore.showMessageModal("Book added to shelf", "success");
+        } catch (error) {
+          this.shelves = oldShelves;
+          console.error("Error adding book to shelf:", error);
+          uiStore.showMessageModal("something went wrong", "error");
+        }
       }
     },
     /*
@@ -182,7 +206,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       if (!authStore.user) {
         return;
       }
-      const shelf = this.shelves.find((s) => s.id === shelfID);
+      const shelf = shelfID ? this.shelves.find((s) => s.id === shelfID) : null;
       if (shelf) {
         shelf.books = shelf.books.filter((book) => book.id !== bookId);
         for (let i = 0; i < this.shelves.length; i++) {
@@ -240,6 +264,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         return;
       }
       try {
+        const oldReviews = this.reviews;
         this.reviews = this.reviews.filter((review) => review.id !== reviewID);
         const userRef = doc(db, `users`, authStore.user.uid);
         await updateDoc(userRef, {
@@ -247,6 +272,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         });
         uiStore.showMessageModal("Review deleted successfully!", "success");
       } catch (error) {
+        this.reviews = oldReviews;
         console.error("Error deleting review:", error);
         uiStore.showMessageModal("Error deleting review!", "error");
       }
@@ -313,6 +339,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       }
       try {
         const userRef = doc(db, `users`, authStore.user.uid);
+        const oldReading = this.reading;
         this.reading = this.reading.map((book) => {
           if (book.id !== bookID) return book;
           return {
@@ -325,6 +352,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         });
         uiStore.showMessageModal("Thought deleted successfully!", "success");
       } catch (error) {
+        this.reading = oldReading;
         console.error("Error deleting thought:", error);
         uiStore.showMessageModal("Error deleting thought!", "error");
       }
@@ -381,7 +409,6 @@ export const useUserBooks = defineStore(`userBooks`, {
       }
     },
     /**
-     * !TODO: Update the delete from finishedBooks action
      ** remove a book from the finished books list.
      ** @param {string} bookID - The ID of the book to remove
      ** @returns {Promise<void>} - Resolves when the update is complete.
@@ -391,15 +418,22 @@ export const useUserBooks = defineStore(`userBooks`, {
       if (!authStore.user) {
         return;
       }
+      const oldFinishedBooks = this.finishedBooks;
       const userRef = doc(db, `users`, authStore.user.uid);
-
-      this.finishedBooks = this.finishedBooks.filter(
-        (book) => book.book.id !== bookID,
-      );
-
-      await updateDoc(userRef, {
-        finishedBooks: this.finishedBooks,
-      });
+      const uiStore = useUiStore();
+      try {
+        this.finishedBooks = this.finishedBooks.filter(
+          (book) => book.book.id !== bookID,
+        );
+        await updateDoc(userRef, {
+          finishedBooks: this.finishedBooks,
+        });
+        uiStore.showMessageModal("Book removed from finished list!", "success");
+      } catch (error) {
+        this.finishedBooks = oldFinishedBooks;
+        console.error("Failed to remove book from finished list:", error);
+        uiStore.showMessageModal("Something went wrong!", "error");
+      }
     },
   },
 });
