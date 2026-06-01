@@ -14,7 +14,9 @@ import { computed, ref } from "vue";
 import AddNewShelfCom from "./AddNewShelfCom.vue";
 import OptionsCom from "../OptionsCom.vue";
 import ShowShelves from "./ShowShelves.vue";
+import { useUiStore } from "@/stores/uiStore";
 const userBooks = useUserBooks();
+const uiStore = useUiStore();
 const props = defineProps({
   book: Object,
   class: String,
@@ -50,6 +52,14 @@ const categories = () => {
   );
   return [...new Set(newCategories.map((cat) => cat.trim()))];
 }
+const confirmDeleteFinishedBook = async () => {
+  uiStore.showAreYouSureModal(
+    "Confirm Action",
+    "Are you sure you want to delete this finished book ? all your reading progress and thoughts will be deleted",
+    () => userBooks.deleteFinishedBook(props.book.id),
+    () => uiStore.hideAreYouSureModal()
+  );
+}
 </script>
 <template>
   <article v-if="props.book" :class="[props.class]" class="w-60 flex flex-col justify-between relative text-white ">
@@ -80,7 +90,7 @@ const categories = () => {
                 <FontAwesomeIcon :icon="faBookOpen" />
                 <p>Stop reading</p>
               </button>
-              <button v-if="isFinished"
+              <button @click="confirmDeleteFinishedBook" v-if="isFinished"
                 class="flex w-50  items-center gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
                 <FontAwesomeIcon :icon="faXmark" />
                 <p>Mark Unfinished</p>
@@ -108,9 +118,9 @@ const categories = () => {
         </div>
       </div>
       <div class=" flex flex-wrap text-sm py-2  w-full font-bold gap-y-4 gap-x-1">
-        <RouterLink :title="isReading ? 'continue reading' : 'startReading'"
-          :class="[isReading ? 'bg-white text-success' : 'bg-success text-white hover:bg-green-600 ']"
-          class="bg-success basis-[49%] text-center cursor-pointer transition p-2 rounded-lg "
+        <RouterLink :title="isReading ? 'Continue reading' : isFinished ? 'Re-read' : 'Start Reading'"
+          :class="[isReading ? 'bg-white text-success' : isFinished ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-success text-white']"
+          class=" basis-[49%] text-center cursor-pointer transition p-2 rounded-lg "
           :to="{ name: 'Book', params: { id: props.book.id } }">
           <FontAwesomeIcon :icon="faBook" />
         </RouterLink>

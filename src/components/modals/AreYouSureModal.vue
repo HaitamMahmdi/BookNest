@@ -15,7 +15,11 @@ onBeforeUnmount(() => {
     unlock()
 })
 useClickOutside(modal, () => {
-    emit("close");
+    if (uiStore.areYouSureModal.onCancel) {
+        uiStore.areYouSureModal.onCancel();
+    } else {
+        uiStore.hideAreYouSureModal();
+    }
 });
 </script>
 
@@ -26,14 +30,13 @@ useClickOutside(modal, () => {
             delete this
             Book ?
         </h2>
-        <p v-if="uiStore.areYouSureModal.description" class=" text-center mb-4 sm:w-4/6 mx-auto ">
+        <p v-if="uiStore.areYouSureModal.description" class=" text-center mb-4 sm:w-5/6 mx-auto ">
             {{ uiStore.areYouSureModal.description }}
         </p>
         <div class=" w-full flex justify-end items-end  ml-auto">
-            <button @click="uiStore.areYouSureModal.onConfirm"
+            <button @click="uiStore.confirm()"
                 class="bg-error/70 hover:bg-error   transition-colors cursor-pointer font-semibold  text-white px-4 py-2 rounded mr-2">Yes</button>
-            <button
-                @click="uiStore.areYouSureModal.onCancel ? uiStore.areYouSureModal.onCancel() : uiStore.hideAreYouSureModal()"
+            <button @click="uiStore.cancel ? uiStore.cancel() : uiStore.hideAreYouSureModal()"
                 class="bg-bg-section/70  hover:bg-bg-section transition-colors cursor-pointer font-semibold   text-white px-8  py-2 rounded">No</button>
         </div>
     </div>
