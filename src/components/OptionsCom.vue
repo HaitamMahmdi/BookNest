@@ -76,7 +76,8 @@ const clickOption = (option) => {
             <FontAwesomeIcon v-if="!$slots.buttonContent" :icon="faEllipsisVertical" />
         </button>
         <div :class="props.optionsListStyle"
-            class="w-30 absolute overflow-hidden rounded-lg  top-full mt-2 bg-Shark  shadow-lg z-10" v-if="showOptions">
+            class="min-w-30 absolute overflow-hidden rounded-lg  top-full mt-2 bg-Shark  shadow-lg z-10"
+            v-if="showOptions">
 
             <button v-if="props.showShare && !hideAll" @click="clickOption('share')"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-warning py-2 px-3  transition-all hover:pl-4 hover:bg-warning/20">
@@ -98,18 +99,18 @@ const clickOption = (option) => {
                 <FontAwesomeIcon :icon="faEyeSlash" />
                 <span>Hide</span>
             </button>
-            <button v-if="props.showReport && !hideAll" @click="clickOption('report')"
-                class="flex items-center w-full gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
-                <FontAwesomeIcon :icon="faBullhorn" />
-                <span>Report</span>
-            </button>
+
             <button @click="clickOption('delete')" v-if="props.showDelete && !hideAll"
                 class="flex w-full items-center gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
                 <FontAwesomeIcon :icon="faTrash" />
                 <span>delete</span>
             </button>
             <slot :closeModal="closeModal" name="customOptions"></slot>
-
+            <button v-if="props.showReport && !hideAll" @click="clickOption('report')"
+                class="flex items-center w-full gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
+                <FontAwesomeIcon :icon="faBullhorn" />
+                <span>Report</span>
+            </button>
         </div>
     </div>
 

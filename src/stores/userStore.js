@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { useUserAuth } from "./userAuth";
 import { doc, updateDoc } from "firebase/firestore";
-import { useMessageStore } from "./MessageStore";
+import { useUiStore } from "./uiStore";
 import { db } from "../firebase";
 
 export const useUserStore = defineStore("userStore", {
@@ -25,7 +25,7 @@ export const useUserStore = defineStore("userStore", {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", uploadPreset);
-      const messageStore = useMessageStore();
+      const uiStore = useUiStore();
 
       try {
         const response = await fetch(
@@ -64,23 +64,23 @@ export const useUserStore = defineStore("userStore", {
               ],
             });
           }
-          messageStore.updateMessage("Image uploaded successfully!", "success");
+          uiStore.showMessageModal("Image uploaded successfully!", "success");
         }
       } catch (error) {
         console.error("Error uploading image:", error);
-        messageStore.updateMessage("Error uploading image!", "error");
+        uiStore.showMessageModal("Error uploading image!", "error");
       }
     },
     async changeProfileMedia(id) {
       const { user } = useUserAuth();
-      const messageStore = useMessageStore();
+      const uiStore = useUiStore();
 
       if (!user) return;
       const imgObj =
         this.profileImageHistory.find((el) => id === el.id) ||
         this.coverImageHistory.find((el) => id === el.id);
       if (!imgObj) {
-        messageStore.updateMessage(
+        uiStore.showMessageModal(
           "Failed to update profile image. Please try again.",
           "error",
         );
@@ -90,16 +90,13 @@ export const useUserStore = defineStore("userStore", {
       updateDoc(docRef, {
         profileImgURL: this.profileImgURL,
       });
-      messageStore.updateMessage(
-        "Profile image updated successfully",
-        "success",
-      );
+      uiStore.showMessageModal("Profile image updated successfully", "success");
     },
     async changeCoverMedia(id) {
       const { user } = useUserAuth();
-      const messageStore = useMessageStore();
+      const uiStore = useUiStore();
       if (!user) {
-        messageStore.updateMessage(
+        uiStore.showMessageModal(
           "Failed to update cover image. Please try again.",
           "error",
         );
@@ -113,7 +110,7 @@ export const useUserStore = defineStore("userStore", {
       updateDoc(docRef, {
         coverURL: this.coverURL,
       });
-      messageStore.updateMessage("Cover image updated successfully", "success");
+      uiStore.showMessageModal("Cover image updated successfully", "success");
     },
   },
 });

@@ -2,9 +2,9 @@
 import { faStop, faCheckCircle, faExclamationTriangle, faXmarkCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { ref } from 'vue';
-import { useMessageStore } from '@/stores/MessageStore';
+import { useUiStore } from '@/stores/UiStore';
 import { useClickOutside } from '@/composables/useClickOutside';
-const messageStore = useMessageStore()
+const uiStore = useUiStore()
 const props = defineProps({
     entersFrom: {
         type: String,
@@ -15,18 +15,18 @@ const message = ref(null)
 const dismissMessage = () => {
     message.value.classList.replace('enterFromTop', 'exitToTop');
     setTimeout(() => {
-        messageStore.dismissMessage()
+        uiStore.hideMessageModal()
     }, 300)
 }
 useClickOutside(message, dismissMessage)
 </script>
 <template>
-    <div v-if="messageStore.messageText" @click="dismissMessage" ref="message"
-        :class="[messageStore.messageType === 'error' ? 'font-semibold bg-error text-white' : messageStore.messageType === 'success' ? 'bg-success text-white' : 'bg-warning text-white']"
+    <div v-if="uiStore.messageModal.text" @click="dismissMessage" ref="message"
+        :class="[uiStore.messageModal.type === 'error' ? 'font-semibold bg-error text-white' : uiStore.messageModal.type === 'success' ? 'bg-success text-white' : 'bg-warning text-white']"
         class=" flex items-center  justify-center fixed top-10 cursor-pointer max-sm:w-full max-sm:px-2 max-w-fit   min-w-2xs py-3 px-4 rounded-full gap-x-2 left-3/6 -translate-x-3/6 shadow-lg z-1000 enterFromTop">
         <FontAwesomeIcon class="mt-px"
-            :icon="messageStore.messageType === 'error' ? faXmarkCircle : messageStore.messageType === 'success' ? faCheckCircle : faExclamationTriangle" />
-        <p> {{ messageStore.messageText }}</p>
+            :icon="uiStore.messageModal.type === 'error' ? faXmarkCircle : uiStore.messageModal.type === 'success' ? faCheckCircle : faExclamationTriangle" />
+        <p> {{ uiStore.messageModal.text }}</p>
     </div>
 </template>
 

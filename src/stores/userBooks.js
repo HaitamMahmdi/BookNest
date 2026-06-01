@@ -3,7 +3,7 @@ import { useUserAuth } from "./userAuth";
 import { useUserStore } from "./userStore";
 import { doc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
-import { useMessageStore } from "./MessageStore";
+import { useUiStore } from "./uiStore";
 export const useUserBooks = defineStore(`userBooks`, {
   state: () => ({
     favorites: [],
@@ -125,7 +125,7 @@ export const useUserBooks = defineStore(`userBooks`, {
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
     async addNewShelf(shelfName) {
-      const messageStore = useMessageStore();
+      const uiStore = useUiStore();
       const authStore = useUserAuth();
       if (!authStore.user) {
         return;
@@ -140,10 +140,10 @@ export const useUserBooks = defineStore(`userBooks`, {
         await updateDoc(userRef, {
           shelves: this.shelves,
         });
-        messageStore.updateMessage("Shelf created successfully!", "success");
+        uiStore.showMessageModal("Shelf created successfully!", "success");
       } catch (error) {
         console.error("Error creating shelf:", error);
-        messageStore.updateMessage("Error creating shelf!", "error");
+        uiStore.showMessageModal("Error creating shelf!", "error");
         return;
       }
     },
@@ -205,9 +205,9 @@ export const useUserBooks = defineStore(`userBooks`, {
      */
     async addNewReview(bookID, review) {
       const authStore = useUserAuth();
-      const messageStore = useMessageStore();
+      const uiStore = useUiStore();
       if (!authStore.user) {
-        messageStore.updateMessage(
+        uiStore.showMessageModal(
           "Failed to add review. Please try again.",
           "error",
         );
@@ -220,10 +220,10 @@ export const useUserBooks = defineStore(`userBooks`, {
         await updateDoc(userRef, {
           reviews: arrayUnion(review),
         });
-        messageStore.updateMessage("Review added successfully!", "success");
+        uiStore.showMessageModal("Review added successfully!", "success");
       } catch (error) {
         console.error("Error adding review:", error);
-        messageStore.updateMessage("Error adding review!", "error");
+        uiStore.showMessageModal("Error adding review!", "error");
       }
     },
 
@@ -234,7 +234,7 @@ export const useUserBooks = defineStore(`userBooks`, {
      */
     async removeReview(reviewID) {
       const authStore = useUserAuth();
-      const messageStore = useMessageStore();
+      const uiStore = useUiStore();
 
       if (!authStore.user) {
         return;
@@ -245,10 +245,10 @@ export const useUserBooks = defineStore(`userBooks`, {
         await updateDoc(userRef, {
           reviews: this.reviews,
         });
-        messageStore.updateMessage("Review deleted successfully!", "success");
+        uiStore.showMessageModal("Review deleted successfully!", "success");
       } catch (error) {
         console.error("Error deleting review:", error);
-        messageStore.updateMessage("Error deleting review!", "error");
+        uiStore.showMessageModal("Error deleting review!", "error");
       }
     },
 
@@ -306,7 +306,7 @@ export const useUserBooks = defineStore(`userBooks`, {
      * @returns {Promise<void>} - Resolves when the update is complete.
      */
     async deleteThought(bookID, thoughtID) {
-      const messageStore = useMessageStore();
+      const uiStore = useUiStore();
       const authStore = useUserAuth();
       if (!authStore.user) {
         return;
@@ -323,10 +323,10 @@ export const useUserBooks = defineStore(`userBooks`, {
         await updateDoc(userRef, {
           reading: this.reading,
         });
-        messageStore.updateMessage("Thought deleted successfully!", "success");
+        uiStore.showMessageModal("Thought deleted successfully!", "success");
       } catch (error) {
         console.error("Error deleting thought:", error);
-        messageStore.updateMessage("Error deleting thought!", "error");
+        uiStore.showMessageModal("Error deleting thought!", "error");
       }
     },
 
@@ -341,7 +341,7 @@ export const useUserBooks = defineStore(`userBooks`, {
         return;
       }
       const userRef = doc(db, `users`, authStore.user.uid);
-      const messageStore = useMessageStore();
+      const uiStore = useUiStore();
       const isReading = this.isReading(book.id);
       if (isReading) {
         const readingRecord = this.reading.find(
@@ -360,13 +360,10 @@ export const useUserBooks = defineStore(`userBooks`, {
           });
           this.reading = updatedReadingObj;
           this.finishedBooks = updatedFinishedObj;
-          messageStore.updateMessage("this Book is finished!", "success");
+          uiStore.showMessageModal("this Book is finished!", "success");
         } catch (error) {
           console.error("Failed to update finished books:", error);
-          messageStore.updateMessage(
-            "Failed to update finished books!",
-            "error",
-          );
+          uiStore.showMessageModal("Failed to update finished books!", "error");
         }
       } else {
         const finishedBookObj = { book: book, thoughts: [] };
@@ -376,13 +373,10 @@ export const useUserBooks = defineStore(`userBooks`, {
             finishedBooks: updatedFinishedObj,
           });
           this.finishedBooks = updatedFinishedObj;
-          messageStore.updateMessage("this Book is finished!", "success");
+          uiStore.showMessageModal("this Book is finished!", "success");
         } catch (error) {
           console.error("Failed to update finished books:", error);
-          messageStore.updateMessage(
-            "Failed to update finished books!",
-            "error",
-          );
+          uiStore.showMessageModal("Failed to update finished books!", "error");
         }
       }
     },

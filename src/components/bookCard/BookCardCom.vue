@@ -4,6 +4,8 @@ import {
   faStar,
   faBook,
   faHeart as solidHeart,
+  faXmark,
+  faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
 import { faBookmark, faHeart } from "@fortawesome/free-regular-svg-icons";
 import { faBookmark as solidBookmark } from "@fortawesome/free-solid-svg-icons";
@@ -66,12 +68,24 @@ const categories = () => {
             '/assets/backGrounds/authBackGround.svg'
             " :alt="props.book?.volumeInfo.title" />
           <span class="w-full -bottom-4 z-10 shadow-[0px_-20px_20px_5px_#00000063] left-0 h-px  absolute "></span>
-          <OptionsCom :show-delete="isInShelf || isFavorite || isReading || isFinished" :show-edit="false"
+          <OptionsCom :show-delete="false" :show-edit="false"
             :show-hide="!isInShelf && !isFavorite && !isReading && !isFinished"
             @finish="userBooks.addToFinishedBooks(props.book)" :show-finish="!isFinished"
             :container-class="`absolute! top-2  flex items-center justify-center rounded-full right-2`"
             button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
             :options-list-style="`right-0`" :book="props.book" @report="$emit('showInfos')">
+            <template #customOptions>
+              <button v-if="isReading"
+                class="flex w- items-center gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
+                <FontAwesomeIcon :icon="faBookOpen" />
+                <p>Stop reading</p>
+              </button>
+              <button v-if="isFinished"
+                class="flex w-50  items-center gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
+                <FontAwesomeIcon :icon="faXmark" />
+                <p>Mark Unfinished</p>
+              </button>
+            </template>
           </OptionsCom>
         </div>
 
