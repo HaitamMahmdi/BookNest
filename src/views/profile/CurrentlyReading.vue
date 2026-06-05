@@ -8,7 +8,7 @@ const userBooks = useUserBooks()
 
 </script>
 <template>
-    <div class=" w-full bg-Shark text-white min-h-screen py-8">
+    <div class=" w-full bg-Shark text-white min-h-120   py-8">
         <div v-if="userBooks.reading.length" class=" container mx-auto gap-x-4 ">
 
             <div class="">
@@ -27,9 +27,8 @@ const userBooks = useUserBooks()
 
 
         </div>
-        <div class=" w-full container mx-auto flex items-top justify-center bg-Shark text-white min-h-screen py-8"
-            v-else>
-            <RouterLink class="text-2xl text-center hover:text-success font-bold  transition-colors" to="/">
+        <div class=" w-full container   mx-auto flex items-top justify-center bg-Shark text-white  py-8" v-else>
+            <RouterLink class="text-2xl h-fit text-center hover:text-success font-bold  transition-colors" to="/">
                 <FontAwesomeIcon class="text-4xl p-1" :icon="faBook" />
 
                 <p>Start reading Now</p>

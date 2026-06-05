@@ -25,6 +25,8 @@ import AddNewShelfCom from "../components/bookCard/AddNewShelfCom.vue";
 import showShelves from "../components/bookCard/ShowShelves.vue";
 import LoadingCom from "../components/LoadingCom.vue";
 import OptionsCom from "../components/OptionsCom.vue";
+import CarouselCom from "@/components/carousel/CarouselCom.vue";
+import SlideCom from "@/components/carousel/SlideCom.vue";
 // store
 import { useUserBooks } from "../stores/userBooks";
 import { useUserAuth } from "../stores/userAuth";
@@ -57,14 +59,11 @@ const thoughts = computed(() => {
   if (isFinishedBook.value && currentBook) {
 
     const finishedBook = userBooks.finishedBooks.find((book) => book.book.id === currentBook)
-    console.log(finishedBook)
     return finishedBook.thoughts
   }
   if (userBooks.reading.length && currentBook) {
     for (const item of userBooks.reading) {
-      console.log(item.book.id, currentBook)
       if (item.book.id === currentBook) {
-        console.log(`we found the book`)
         return item.thoughts
       }
     }
@@ -83,27 +82,22 @@ const similarBooks = ref([]);
 
 watch(
   () => book.value,
-  (newVal) => {
-    document.title = `${newVal.volumeInfo.title} - BookNest`;
-    /*
-        if (newVal) {
-          const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
-    
-          if (categories.value.length) {
-            (async () => {
-              const resp = await fetch(
-                `https://www.googleapis.com/books/v1/volumes?q=subject:${categories.value[0]}&orderBy=relevance&langRestrict=en&maxResults=20?key=${apiKey}`,
-              );
-              let data = await resp.json();
-              similarBooks.value = data.items;
-              console.log(similarBooks.value)
-    
-              return;
-            })();
-          }
-        }
-        */
-  },
+  async (newVal) => {
+    if (newVal?.volumeInfo?.title) {
+      document.title = `${newVal.volumeInfo.title} - BookNest`;
+    }
+    if (!newVal || !categories.value.length) return;
+    try {
+      const apiKey = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
+      const resp = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=subject:${categories.value[0]}&orderBy=relevance&langRestrict=en&maxResults=20&key=${apiKey}`
+      );
+      const data = await resp.json();
+      similarBooks.value = data.items || [];
+    } catch (err) {
+      console.error("Failed to fetch similar books:", err);
+    }
+  }
 );
 onBeforeUnmount(() => {
   document.title = `BookNest`;
@@ -134,43 +128,43 @@ const showAddNewShelfCom = ref(false)
 
           </div>
           <div class="max-xs:w-full max-lg:w-60">
-            <button @click="userBooks.addToFinishedBooks(book)"
+            <button @click="userBooks.addToFinishedBooks(book)" :disabled="userBooks.isFinishedBook(book?.id)"
               :class="[userBooks.isFinishedBook(book?.id) ? 'text-green-400 bg-white font-bold cursor-default  ' : 'cursor-pointer text-text-main bg-green-400 font-semibold']"
-              class="lg:text-2xl text-sm    px-2 py-2 rounded-md mt-4 w-full">
-              <div v-if="!userBooks.isFinishedBook(book?.id)"
-                class="max-w-55 flex items-center justify-between mx-auto">
-                <p>mark as read</p>
+              class="lg:text-2xl text-sm px-2 py-2 rounded-md mt-4 w-full">
+              <div v-if="!userBooks.isFinishedBook(book?.id)" class="w-67 flex items-center justify-between mx-auto">
+                <p class=" font-bold">Mark as read</p>
                 <FontAwesomeIcon :icon="faBook" />
               </div>
-              <div v-else class="max-w-55 flex items-center justify-between mx-auto">
-                <p class="text-lg">you'v finished this book</p>
+              <div v-else class="w-67 flex items-center justify-between mx-auto">
+                <p>Completed Book</p>
+                <FontAwesomeIcon :icon="faBook" />
               </div>
             </button>
             <button
               @click="userBooks.isFavorite(book?.id) ? userBooks.removeFromFavorites(book?.id) : userBooks.addToFavorites(book)"
               :class="[userBooks.isFavorite(book?.id) ? 'text-error bg-white   ' : 'text-text-main bg-error']"
               class="lg:text-2xl text-sm cursor-pointer font-semibold  px-2 py-2 rounded-md mt-4 w-full">
-              <div v-if="!userBooks.isFavorite(book.id)" class="max-w-55  flex items-center justify-between mx-auto">
-                <p>add to favorites</p>
+              <div v-if="!userBooks.isFavorite(book.id)" class="w-67 flex items-center justify-between mx-auto">
+                <p>Add to favorites</p>
                 <font-awesome-icon :icon="faHeartSolid" class="" />
               </div>
-              <div v-else class="max-w-55 flex items-center justify-between  mx-auto">
-                <p class=" text-lg mx-auto font-bold">One of your favorites</p>
+              <div v-else class="w-67 flex items-center justify-center">
+                <p class="font-bold">One of your favorites</p>
                 <FontAwesomeIcon :icon="faHeartSolid" />
               </div>
             </button>
             <button @click="showModal = !showModal"
               class="lg:text-2xl relative bg-neutral-800 text-sm cursor-pointer font-semibold text-text-main p-2 rounded-md mt-4 w-full">
               <div v-if="!userBooks.isInShelfGetter(null, book.id)"
-                class="max-w-55 flex items-center justify-between mx-auto">
+                class="w-67 flex items-center justify-between mx-auto">
                 <p>add to shelf</p>
                 <FontAwesomeIcon :icon="faBookmark" />
               </div>
-              <div v-else class="max-w-55 flex items-center justify-center gap-x-2 mx-auto">
-                <p class="text-lg">On shelf</p>
+              <div v-else class="w-67 flex items-center justify-between mx-auto">
+                <p class=" font-bold">On shelf</p>
                 <FontAwesomeIcon class=" text-star" :icon="faBookmark" />
               </div>
-              <showShelves v-if="showModal" :class="`w-full text-lg`" @close-shelves-com="showModal = false"
+              <showShelves v-if="showModal" :class="`w-full`" @close-shelves-com="showModal = false"
                 @open-add-new-shelf-com="showAddNewShelfCom = true" :book="book"></showShelves>
             </button>
           </div>
@@ -258,7 +252,7 @@ const showAddNewShelfCom = ref(false)
     </section>
     <section class="mt-20 py-10 bg-Shark">
       <div class="container mx-auto sm:px-4">
-        <h3 class="w-fit text-white text-4xl max-sm:mx-auto pt-8 font-bold">
+        <h3 class="w-fit mb-8 text-white text-4xl max-sm:mx-auto pt-8 font-bold">
           users reviews
           <span class="text-2xl text-[#888] font-normal">({{ book.volumeInfo.ratingsCount || 0 }})</span>
         </h3>
@@ -269,32 +263,43 @@ const showAddNewShelfCom = ref(false)
         </button>
         <AddReviewCom :bookID="book.id" :show="showAddReviewCom" @close="showAddReviewCom = false"
           v-if="showAddReviewCom" ref="addReviewCom" />
+        <!-- !Fix style error :( -->
+        <div class="">
+          <CarouselCom :items-per-view="4" :show-arrows="true">
+            <SlideCom>
 
-        <div class="slider flex overflow-x-scroll w-full mt-8 mx-auto">
-          <ReviewBoxCom v-if="userReview" :class="`min-w-[300px] bg-blue-600 mx-auto `" :obj="{
-            name: `${userAuth.displayName || 'user'}`,
-            profileImg: `https://picsum.photos/200/300?random=1`,
-            rating: userReview.rating,
-            review: userReview.body,
-          }" :reviewID="userReview.id" :isUserReview="true" />
-          <ReviewBoxCom v-if="book.volumeInfo.ratingsCount" v-for="(review, index) in book.volumeInfo.ratingsCount"
-            :key="index" :class="`min-w-[300px] mx-2`" :obj="{
-              name: `user${index + 1}`,
-              profileImg: `https://picsum.photos/200/300?random=${index + 1}`,
-              rating: book.volumeInfo.averageRating,
-              review: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt earum reiciendis voluptate velit error inventore nobis,  totam aspernatur expedita, magnam nihil.`,
-            }" />
+              <ReviewBoxCom v-if="userReview" :class="` bg-blue-600 mx-auto `" :obj="{
+                name: `${userAuth.displayName || 'user'}`,
+                profileImg: `https://picsum.photos/200/300?random=1`,
+                rating: userReview.rating,
+                review: userReview.body,
+              }" :reviewID="userReview.id" :isUserReview="true" />
+              <div v-else-if="!userReview && !book.volumeInfo.ratingsCount"
+                class="bg-bg-secondary  mx-auto px-4 py-4 rounded-lg relative text-white">
+                <p class="font-bold text-center mt-4 text-text-main text-2xl">
+                  add your review
+                </p>
+                <button @click="showAddReviewCom = true" id="part"
+                  class="px-4 py-2 cursor-pointer bg-primary mx-auto block bg-bg-main mt-10 text-white rounded-lg hover:bg-blue-600">
+                  add new review
+                </button>
+              </div>
+            </SlideCom>
 
-          <div v-else-if="!userReview && !book.volumeInfo.ratingsCount"
-            class="bg-bg-secondary md:w-2xl mx-auto px-4 py-4 rounded-lg relative text-white">
-            <p class="font-bold text-center mt-4 text-text-main text-2xl">
-              add your review
-            </p>
-            <button @click="showAddReviewCom = true" id="part"
-              class="px-4 py-2 cursor-pointer bg-primary mx-auto block bg-bg-main mt-10 text-white rounded-lg hover:bg-blue-600">
-              add new review
-            </button>
-          </div>
+            <SlideCom v-if="book.volumeInfo.ratingsCount" v-for="(review, index) in book.volumeInfo.ratingsCount"
+              :key="index">
+              <ReviewBoxCom :class="` mx-2`" :obj="{
+                name: `user${index + 1}`,
+                profileImg: `https://picsum.photos/200/300?random=${index + 1}`,
+                rating: book.volumeInfo.averageRating,
+                review: `Lorem ipsum dolor sit amet consectetur adipisicing elit. Nesciunt earum reiciendis voluptate velit error inventore nobis,  totam aspernatur expedita, magnam nihil.`,
+              }" />
+
+            </SlideCom>
+
+          </CarouselCom>
+
+
         </div>
       </div>
     </section>
@@ -303,8 +308,14 @@ const showAddNewShelfCom = ref(false)
         <h3 class="w-fit text-white text-4xl max-sm:mx-auto pt-8 font-bold">
           similar books :
         </h3>
+        <!-- !Fix style error :( -->
+        <CarouselCom :items-per-view="4" :show-arrows="true">
+          <SlideCom v-for="book in similarBooks" :key="book">
+            <BookCardCom :book="book" />
+          </SlideCom>
+
+        </CarouselCom>
         <div class="flex max-w-316 mx-auto snap-center slider w-full overflow-x-scroll gap-x-4 my-8">
-          <BookCardCom :class="` min-w-45 text-lg`" v-for="book in similarBooks" :key="book" :book="book" />
         </div>
       </div>
     </section>

@@ -243,7 +243,7 @@ const imgSelectedForCover = async (id) => {
                 </li>
                 <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg max-sm:hidden">
                     <RouterLink class="p-4 block" :to="{ name: 'CurrentlyReading', params: { id: profileId } }">
-                        <p>Books read</p>
+                        <p>Currently Reading</p>
                     </RouterLink>
                 </li>
                 <li class=" hover:bg-gray-700 transition cursor-pointer rounded-lg  max-sm:hidden">
@@ -267,7 +267,7 @@ const imgSelectedForCover = async (id) => {
                             </template>
                             <template #customOptions>
                 <li class="p-4 hover:bg-gray-700 sm:hidden transition cursor-pointer rounded-lg">
-                    <p>Books read</p>
+                    <p>Currently Reading</p>
                 </li>
                 <li class="p-4 hover:bg-gray-700 sm:hidden transition cursor-pointer rounded-lg">
                     <p>Friends</p>

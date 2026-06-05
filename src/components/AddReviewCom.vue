@@ -3,7 +3,7 @@ import { onMounted, onUnmounted, reactive, ref, useTemplateRef } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useUserBooks } from "@/stores/userBooks";
-import { useMessageStore } from "@/stores/MessageStore";
+import { useUiStore } from "@/stores/uiStore";
 import { useClickOutside } from "@/composables/useClickOutside";
 const emit = defineEmits(['close'])
 const props = defineProps({
@@ -14,7 +14,7 @@ const props = defineProps({
   },
 });
 const userBooks = useUserBooks()
-const messageStore = useMessageStore()
+const uiStore = useUiStore()
 const star = ref([null]);
 const reviewObj = reactive({
   title: "",
@@ -26,7 +26,6 @@ const errorMessage = ref("");
 const container = ref(null)
 useClickOutside(container, () => {
   container.value.reset
-  messageStore.dismissMessage()
   emit('close')
 })
 const changeStare = (e) => {
@@ -43,7 +42,7 @@ const changeStare = (e) => {
 };
 const addNewReview = async () => {
   if (!reviewObj.title || !reviewObj.body || reviewObj.rating === 0) {
-    messageStore.updateMessage("Please fill in all required fields and select a star rating", "error");
+    uiStore.showMessageModal("Please fill in all required fields and select a star rating", "error");
     return;
   }
   const date = new Date()

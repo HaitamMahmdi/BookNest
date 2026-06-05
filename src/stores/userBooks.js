@@ -91,7 +91,7 @@ export const useUserBooks = defineStore(`userBooks`, {
       } catch (error) {
         this.favorites = oldFav;
         console.error("Error removing from favorites:", error);
-        uiStore.showMessageModal("Error removing from favorites!", "error");
+        uiStore.showMessageModal("Error removing from favorites", "error");
       }
     },
     /*
@@ -244,10 +244,10 @@ export const useUserBooks = defineStore(`userBooks`, {
         await updateDoc(userRef, {
           reviews: arrayUnion(review),
         });
-        uiStore.showMessageModal("Review added successfully!", "success");
+        uiStore.showMessageModal("Review added successfully", "success");
       } catch (error) {
         console.error("Error adding review:", error);
-        uiStore.showMessageModal("Error adding review!", "error");
+        uiStore.showMessageModal("Error adding review", "error");
       }
     },
 
@@ -270,11 +270,11 @@ export const useUserBooks = defineStore(`userBooks`, {
         await updateDoc(userRef, {
           reviews: this.reviews,
         });
-        uiStore.showMessageModal("Review deleted successfully!", "success");
+        uiStore.showMessageModal("Review deleted successfully", "success");
       } catch (error) {
         this.reviews = oldReviews;
         console.error("Error deleting review:", error);
-        uiStore.showMessageModal("Error deleting review!", "error");
+        uiStore.showMessageModal("Error deleting review", "error");
       }
     },
 
@@ -334,30 +334,27 @@ export const useUserBooks = defineStore(`userBooks`, {
     async deleteThought(bookID, thoughtID) {
       const uiStore = useUiStore();
       const authStore = useUserAuth();
-      if (!authStore.user) {
-        return;
-      }
+      const oldReading = this.reading;
+      if (!authStore.user) return;
       try {
-        const userRef = doc(db, `users`, authStore.user.uid);
-        const oldReading = this.reading;
+        const userRef = doc(db, "users", authStore.user.uid);
         this.reading = this.reading.map((book) => {
-          if (book.id !== bookID) return book;
+          if (book.book.id !== bookID) return book;
           return {
             ...book,
-            reading: book.reading.filter((thought) => thought.id !== thoughtID),
+            thoughts: book.thoughts.filter((obj) => obj.id !== thoughtID),
           };
         });
         await updateDoc(userRef, {
           reading: this.reading,
         });
-        uiStore.showMessageModal("Thought deleted successfully!", "success");
+        uiStore.showMessageModal("Thought deleted successfully", "success");
       } catch (error) {
         this.reading = oldReading;
         console.error("Error deleting thought:", error);
-        uiStore.showMessageModal("Error deleting thought!", "error");
+        uiStore.showMessageModal("Error deleting thought", "error");
       }
     },
-
     /*
      * add a book to the finished books list. and remove it reading progress from reading if it exist and add it to the FinishedObj
      * @param {string} bookID - The ID of the book to add
@@ -388,10 +385,10 @@ export const useUserBooks = defineStore(`userBooks`, {
           });
           this.reading = updatedReadingObj;
           this.finishedBooks = updatedFinishedObj;
-          uiStore.showMessageModal("this Book is finished!", "success");
+          uiStore.showMessageModal("this Book is finished", "success");
         } catch (error) {
           console.error("Failed to update finished books:", error);
-          uiStore.showMessageModal("Failed to update finished books!", "error");
+          uiStore.showMessageModal("Failed to update finished books", "error");
         }
       } else {
         const finishedBookObj = { book: book, thoughts: [] };
@@ -401,10 +398,10 @@ export const useUserBooks = defineStore(`userBooks`, {
             finishedBooks: updatedFinishedObj,
           });
           this.finishedBooks = updatedFinishedObj;
-          uiStore.showMessageModal("this Book is finished!", "success");
+          uiStore.showMessageModal("this Book is finished", "success");
         } catch (error) {
           console.error("Failed to update finished books:", error);
-          uiStore.showMessageModal("Failed to update finished books!", "error");
+          uiStore.showMessageModal("Failed to update finished books", "error");
         }
       }
     },
@@ -428,11 +425,11 @@ export const useUserBooks = defineStore(`userBooks`, {
         await updateDoc(userRef, {
           finishedBooks: this.finishedBooks,
         });
-        uiStore.showMessageModal("Book removed from finished list!", "success");
+        uiStore.showMessageModal("Book removed from finished list", "success");
       } catch (error) {
         this.finishedBooks = oldFinishedBooks;
         console.error("Failed to remove book from finished list:", error);
-        uiStore.showMessageModal("Something went wrong!", "error");
+        uiStore.showMessageModal("Something went wrong", "error");
       }
     },
   },

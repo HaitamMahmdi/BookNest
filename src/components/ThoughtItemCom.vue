@@ -16,7 +16,8 @@ const deleteThought = async () => {
 }
 </script>
 <template>
-    <li class="flex flex-col justify-between gap-4 w-full mx-auto  px-4  bg-Shark">
+    <li
+        class="flex flex-col justify-between gap-4 w-full mx-auto  px-4 border-t border-bg-tertiary bg-linear-to-b from-bg-main to-bg-main/80 rounded-lg py-4">
         <div class=" flex justify-between items-center border-b border-bg-secondary py-2">
             <p>{{ props.index }}</p>
             <div class="flex gap-x-1">

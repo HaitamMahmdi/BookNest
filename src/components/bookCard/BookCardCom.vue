@@ -62,7 +62,8 @@ const confirmDeleteFinishedBook = async () => {
 }
 </script>
 <template>
-  <article v-if="props.book" :class="[props.class]" class="w-60 flex flex-col justify-between relative text-white ">
+  <article v-if="props.book" :class="[props.class]"
+    class="w-60 h-111 flex flex-col justify-between relative text-white ">
     <div class="header overflow-hidden ">
       <div>
         <div class="relative bg-bg-secondary/40 rounded-t-lg overflow-hidden  py-2">
@@ -106,8 +107,8 @@ const confirmDeleteFinishedBook = async () => {
       <div class="mb-2 ">
         <p class="text-center text-lg mt-2 font-semibold" :title="props.book?.volumeInfo.title">
           {{
-            props.book?.volumeInfo.title.length > 20
-              ? props.book.volumeInfo.title.slice(0, 20) + "..."
+            props.book?.volumeInfo.title.length > 16
+              ? props.book.volumeInfo.title.slice(0, 16) + "..."
               : props.book?.volumeInfo.title
           }}
         </p>
@@ -118,7 +119,7 @@ const confirmDeleteFinishedBook = async () => {
         </div>
       </div>
       <div class=" flex flex-wrap text-sm py-2  w-full font-bold gap-y-4 gap-x-1">
-        <RouterLink :title="isReading ? 'Continue reading' : isFinished ? 'Re-read' : 'Start Reading'"
+        <RouterLink target="_blank" :title="isReading ? 'Continue reading' : isFinished ? 'Re-read' : 'Start Reading'"
           :class="[isReading ? 'bg-white text-success' : isFinished ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-success text-white']"
           class=" basis-[49%] text-center cursor-pointer transition p-2 rounded-lg "
           :to="{ name: 'Book', params: { id: props.book.id } }">

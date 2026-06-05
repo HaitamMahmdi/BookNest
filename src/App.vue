@@ -26,7 +26,7 @@ onUnmounted(() => {
 </script>
 <template>
   <header-com v-if="userAuth"></header-com>
-  <main class="bg-bg-main min-h-screen py-14">
+  <main class="bg-bg-main pt-20 min-h-screen ">
     <MessageModal enters-from="top"></MessageModal>
     <AreYouSureModal v-if="uiStore.areYouSureModal.show"></AreYouSureModal>
     <router-view :key="$route.fullPath"></router-view>

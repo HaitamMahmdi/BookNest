@@ -35,7 +35,7 @@ const showAddNewShelfCom = ref(false);
                         class=" flex  hover:bg-bg-secondary rounded-2xl transition sm:min-w-2xs justify-between items-center text-warning font-semibold px-4 py-5 ">
                         <p>Hours spent reading: </p>
                         <div class="flex items-center gap-x-1">
-                            <p>1000h</p>
+                            <p>100h</p>
                             <FontAwesomeIcon :icon="faClock" />
                         </div>
                     </li>
@@ -45,7 +45,7 @@ const showAddNewShelfCom = ref(false);
 
                         <p>Currently reading :</p>
                         <div class="flex items-center justify-between gap-x-1">
-                            <p>25</p>
+                            <p>{{ readingList.length }}</p>
                             <FontAwesomeIcon :icon="faBook" />
                         </div>
                     </li>
@@ -54,7 +54,7 @@ const showAddNewShelfCom = ref(false);
 
                         <p>Finished books: </p>
                         <div>
-                            <span>100</span>
+                            <span>{{ userBooks.finishedBooks.length }}</span>
                             <FontAwesomeIcon :icon="faBook" />
                         </div>
                     </li>
