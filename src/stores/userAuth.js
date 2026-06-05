@@ -51,6 +51,7 @@ export const useUserAuth = defineStore(`userAuth`, {
           ],
           reading: [],
           finishedBooks: [],
+          quotes: [],
           reviews: [],
         });
 

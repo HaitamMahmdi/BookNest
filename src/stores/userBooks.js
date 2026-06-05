@@ -119,6 +119,7 @@ export const useUserBooks = defineStore(`userBooks`, {
           userStore.profileImgURL = data.profileImgURL || "";
           userStore.coverImageHistory = data.coverImageHistory || [];
           userStore.profileImageHistory = data.profileImageHistory || [];
+          userStore.quotes = data.quotes || [];
         }
       });
     },

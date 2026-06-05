@@ -16,6 +16,7 @@ export const useUserStore = defineStore("userStore", {
       id: "",
     },
     profileImageHistory: [],
+    quotes: [],
   }),
   actions: {
     async updateProfileMedia(file, type) {
@@ -111,6 +112,57 @@ export const useUserStore = defineStore("userStore", {
         coverURL: this.coverURL,
       });
       uiStore.showMessageModal("Cover image updated successfully", "success");
+    },
+
+    async addQuote(text) {
+      const { user } = useUserAuth();
+      const uiStore = useUiStore();
+      if (!user) return;
+      const trimmedText = String(text || "").trim();
+      if (!trimmedText) {
+        uiStore.showMessageModal(
+          "Please enter a quote before saving.",
+          "error",
+        );
+        return;
+      }
+      const docRef = doc(db, "users", user.uid);
+      const newQuote = {
+        id: crypto.randomUUID(),
+        text: trimmedText,
+        createdAt: new Date().toISOString(),
+      };
+      const oldQuotes = this.quotes;
+      this.quotes = [...this.quotes, newQuote];
+      try {
+        await updateDoc(docRef, {
+          quotes: this.quotes,
+        });
+        uiStore.showMessageModal("Quote added successfully", "success");
+      } catch (error) {
+        this.quotes = oldQuotes;
+        console.error("Error adding quote:", error);
+        uiStore.showMessageModal("Error adding quote", "error");
+      }
+    },
+
+    async deleteQuote(quoteId) {
+      const { user } = useUserAuth();
+      const uiStore = useUiStore();
+      if (!user) return;
+      const oldQuotes = this.quotes;
+      this.quotes = this.quotes.filter((quote) => quote.id !== quoteId);
+      const docRef = doc(db, "users", user.uid);
+      try {
+        await updateDoc(docRef, {
+          quotes: this.quotes,
+        });
+        uiStore.showMessageModal("Quote deleted successfully", "success");
+      } catch (error) {
+        this.quotes = oldQuotes;
+        console.error("Error deleting quote:", error);
+        uiStore.showMessageModal("Error deleting quote", "error");
+      }
     },
   },
 });

@@ -25,7 +25,7 @@ onUnmounted(() => {
 });
 </script>
 <template>
-  <header-com v-if="userAuth"></header-com>
+  <header-com v-if="userAuth.user"></header-com>
   <main class="bg-bg-main pt-20 min-h-screen ">
     <MessageModal enters-from="top"></MessageModal>
     <AreYouSureModal v-if="uiStore.areYouSureModal.show"></AreYouSureModal>
