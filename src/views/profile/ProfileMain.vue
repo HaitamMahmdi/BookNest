@@ -1,6 +1,6 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faPen, faBook, faClock, faMessage, faLocation, faCakeCandles, faShare, faHeart, faBookmark as solidBookmark, faStar, faUser, faEllipsis, faEllipsisVertical, faCamera, faImage, faUpload, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faBook, faClock, faMessage, faLocation, faCakeCandles, faShare, faHeart, faBookmark as solidBookmark, faStar, faUser, faEllipsis, faEllipsisVertical, faCamera, faImage, faUpload, faTrash, faDeaf } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular, faBookmark } from '@fortawesome/free-regular-svg-icons';
 import CarouselCom from '@/components/carousel/CarouselCom.vue'
 import SlideCom from '@/components/carousel/SlideCom.vue';
@@ -8,6 +8,8 @@ import BookCardCom from '@/components/bookCard/BookCardCom.vue';
 import ShowShelves from '@/components/bookCard/ShowShelves.vue';
 import AddNewShelfCom from "@/components/bookCard/AddNewShelfCom.vue";
 import OptionsCom from '@/components/OptionsCom.vue';
+import AddQuoteModal from '@/components/modals/AddQuoteModal.vue';
+import Modal from '@/components/modals/Modal.vue';
 import { useUserBooks } from '@/stores/userBooks';
 import { useUserStore } from '@/stores/userStore';
 import { computed, ref } from 'vue';
@@ -21,6 +23,7 @@ const readingList = computed(() => userBooks.reading)
 const reading = computed(() => readingList.value.length ? readingList.value[readingList.value.length - 1].book : null)
 const showModal = ref(false)
 const showAddNewShelfCom = ref(false);
+const show = ref(false);
 </script>
 <template>
     <section class=" text-white  bg-Shark pt-4">
@@ -60,7 +63,8 @@ const showAddNewShelfCom = ref(false);
                     </li>
 
                 </ul>
-                <div class="bg-bg-main rounded-lg cursor-default mt-4 p-4">
+                <div class="bg-bg-main  rounded-lg cursor-default mt-4 p-4">
+
                     <p class=" text-2xl font-bold mb-2 ">
                         Personal details:</p>
                     <ul>
@@ -71,36 +75,37 @@ const showAddNewShelfCom = ref(false);
                         </li>
                     </ul>
                 </div>
-                <div class="bg-bg-main rounded-lg cursor-default mt-4 p-4">
+                <div class="bg-bg-main relative rounded-lg cursor-default mt-4 p-4">
+
                     <p class=" text-2xl font-bold mb-4 ">
                         favourite quotes :</p>
-                    <p class="font-semibold pl-4 py-2 italic underline bg-Shark rounded-2xl leading-relaxed">"Lorem
-                        ipsum
-                        dolor
-                        sitamet consectetur adipisicing"
+                    <button v-if="userStore.quotes.length" v-for="quote in userStore.quotes" :key="quote"
+                        class="font-semibold group flex w-full   items-center justify-center p-2 mb-4 overflow-hidden italic underline bg-Shark rounded-2xl leading-relaxed">
+                        <p class="w-57 wrap-break-word p-2">{{ quote.text }}</p>
+                        <button
+                            class="flex flex-col gap-2  relative -right-30 transition-all  group-focus:right-0 group-hover:right-0 items-center justify-center">
+                            <FontAwesomeIcon :icon="faShare"
+                                class=" bg-warning/60 p-2 rounded-lg transition-colors hover:bg-warning cursor-pointer text-sm" />
+                            <FontAwesomeIcon :icon="faTrash" @click="userStore.deleteQuote(quote.id)"
+                                class=" text-sm rounded-lg p-2 bg-error/60 transition-colors hover:bg-error cursor-pointer" />
 
-                    </p>
-                    <p class="font-semibold pl-4 py-2 my-4 italic underline bg-Shark rounded-2xl leading-relaxed">
-                        "Lorem
-                        ipsum
-                        dolor
-                        sitamet consectetur adipisicing"
-
-                    </p>
-                    <p class="font-semibold pl-4 py-2 italic underline bg-Shark rounded-2xl leading-relaxed">"Lorem
-                        ipsum
-                        dolor
-                        sitamet consectetur adipisicing"
-
-                    </p>
-                    <button
-                        class="bg-primary w-full bg-blue-600/40 cursor-pointer  text-white py-2 px-4 mt-4 rounded-lg hover:bg-blue-600 transition">
-                        Add Quote
+                        </button>
                     </button>
-                    <button
-                        class="bg-primary w-full bg-bg-tertiary/40 cursor-pointer  text-white py-2 px-4 mt-4 rounded-lg hover:bg-bg-tertiary transition">
-                        see all quotes
-                    </button>
+
+                    <div>
+                        <button @click="show = true"
+                            class="bg-primary w-full bg-blue-600/40 cursor-pointer  text-white py-2 px-4 mt-4 rounded-lg hover:bg-blue-600 transition">
+                            Add Quote
+                        </button>
+                        <button v-if="userStore.quotes.length > 3"
+                            class="bg-primary w-full bg-bg-tertiary/40 cursor-pointer  text-white py-2 px-4 mt-4 rounded-lg hover:bg-bg-tertiary transition">
+                            see all quotes
+                        </button>
+
+                    </div>
+                    <Modal v-if="show" :show="show" @close="show = false">
+                        <AddQuoteModal></AddQuoteModal>
+                    </Modal>
                 </div>
                 <div class="bg-bg-main rounded-lg cursor-default mt-4 p-4">
                     <p class=" text-2xl font-bold mb-2 ">
@@ -216,7 +221,8 @@ const showAddNewShelfCom = ref(false);
                                 </button>
                                 <showShelves @close-shelves-com="showModal = false"
                                     @open-add-new-shelf-com="showAddNewShelfCom = true" :book="reading"
-                                    v-if="showModal"></showShelves>
+                                    v-if="showModal">
+                                </showShelves>
                                 <button
                                     @click="userBooks.isFavorite(reading.id) ? userBooks.removeFromFavorites(reading.id) : userBooks.addToFavorites(reading)"
                                     :class="[userBooks.isFavorite(reading.id) ? 'bg-white text-error' : 'bg-error text-white  hover:bg-red-600 ']"
@@ -257,7 +263,7 @@ const showAddNewShelfCom = ref(false);
                             <article
                                 class="  group relative shrink-0  text-center bg-bg-main pb-4  rounded-2xl overflow-hidden  ">
                                 <span
-                                    class=" block z-20 rounded-2xl  absolute top-0 left-0 w-full h-full  inset-0 pointer-events-none  group-hover:shadow-[0_0px_0px_8px_#a27b5c_inset] shadow-[0_0px_0px_2px_#a27b5c_inset] transition-all"></span>
+                                    class=" block z-10 rounded-2xl  absolute top-0 left-0 w-full h-full  inset-0 pointer-events-none  group-hover:shadow-[0_0px_0px_8px_#a27b5c_inset] shadow-[0_0px_0px_2px_#a27b5c_inset] transition-all"></span>
                                 <div>
                                     <img class="w-full" :src="`https://randomuser.me/api/portraits/men/${x + 1}.jpg`"
                                         alt="author" />
