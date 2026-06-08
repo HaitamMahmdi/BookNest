@@ -13,9 +13,11 @@ import {
   faInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { useUserAuth } from "../stores/userAuth";
+import { useUserAuth } from "@/stores/userAuth";
+import { useUserStore } from "@/stores/userStore";
 const showDropdown = ref(false);
 const user = useUserAuth()
+const userStore = useUserStore()
 const userID = computed(() => user.user?.uid)
 const profile = ref(null);
 const handleClick = (e) => {
@@ -37,7 +39,8 @@ const handleClick = (e) => {
       <SearchbarCom :prop-class="'mr-4'"></SearchbarCom>
     </div>
     <button ref="profile" class="block h-full max-sm:w-full pl-4 relative cursor-pointer">
-      <img @click.self="handleClick($event)" class="w-11 aspect-square rounded-full" src="/assets/authors/author4.webp"
+      <img @click.self="handleClick($event)" class="w-11 aspect-square rounded-full"
+        :src="userStore.profileImgURL?.url ? userStore.profileImgURL?.url : `https://www.gravatar.com/avatar/?d=mp`"
         alt="Profile" />
       <ul v-if="showDropdown"
         class="absolute bg-[#354445] z-50 text-text-main top-full right-0 max-sm:left-0 max-sm:w-full">

@@ -295,9 +295,9 @@ const show = ref(false);
                     <h3
                         class="  bg-bg-main max-sm:mx-auto mb-4 hover:bg-bg-secondary rounded-2xl transition w-fit font-semibold text-2xl p-4  ">
                         Finished books :</h3>
-                    <div>
+                    <div v-if="userBooks.finishedBooks.length > 1">
 
-                        <CarouselCom v-if="userBooks.finishedBooks.length > 1" :items-per-view="4" :show-arrows="true">
+                        <CarouselCom :items-per-view="4" :show-arrows="true">
                             <SlideCom v-for="book in userBooks.finishedBooks" :key="book.id">
                                 <BookCardCom :book="book.book"></BookCardCom>
                             </SlideCom>
@@ -305,6 +305,17 @@ const show = ref(false);
                         </CarouselCom>
                         <BookCardCom v-if="userBooks.finishedBooks.length < 1" :book="userBooks.finishedBooks[0]?.book">
                         </BookCardCom>
+                    </div>
+                    <div class=" w-full container   mx-auto flex items-top justify-center bg-Shark text-white  py-8"
+                        v-else>
+                        <RouterLink class="text-2xl h-fit text-center hover:text-success font-bold  transition-colors"
+                            to="/">
+                            <FontAwesomeIcon class="text-4xl p-1" :icon="faBook" />
+
+                            <p>Start reading Now</p>
+
+                        </RouterLink>
+
                     </div>
                 </div>
             </section>
