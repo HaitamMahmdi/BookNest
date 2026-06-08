@@ -17,6 +17,7 @@ export const useUserStore = defineStore("userStore", {
     },
     profileImageHistory: [],
     quotes: [],
+    about: "",
   }),
   actions: {
     async updateProfileMedia(file, type) {
@@ -112,6 +113,31 @@ export const useUserStore = defineStore("userStore", {
         coverURL: this.coverURL,
       });
       uiStore.showMessageModal("Cover image updated successfully", "success");
+    },
+
+    async updateAbout(aboutText) {
+      const { user } = useUserAuth();
+      const uiStore = useUiStore();
+      if (!user) {
+        return;
+      }
+      const trimmedAbout = String(aboutText || "").trim();
+      this.about = trimmedAbout;
+      const oldAbout = this.about;
+      const docRef = doc(db, "users", user.uid);
+      try {
+        await updateDoc(docRef, {
+          about: this.about,
+        });
+        uiStore.showMessageModal(
+          "About section updated successfully",
+          "success",
+        );
+      } catch (error) {
+        this.about = oldAbout;
+        console.error("Error updating about section:", error);
+        uiStore.showMessageModal("Error updating about section", "error");
+      }
     },
 
     async addQuote(text) {

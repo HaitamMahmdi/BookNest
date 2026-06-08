@@ -120,6 +120,7 @@ export const useUserBooks = defineStore(`userBooks`, {
           userStore.coverImageHistory = data.coverImageHistory || [];
           userStore.profileImageHistory = data.profileImageHistory || [];
           userStore.quotes = data.quotes || [];
+          userStore.about = data.about || "";
         }
       });
     },

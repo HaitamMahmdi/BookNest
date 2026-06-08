@@ -53,6 +53,7 @@ export const useUserAuth = defineStore(`userAuth`, {
           finishedBooks: [],
           quotes: [],
           reviews: [],
+          about: "",
         });
 
         console.log("User document created in Firestore");

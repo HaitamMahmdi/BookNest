@@ -24,6 +24,13 @@ const reading = computed(() => readingList.value.length ? readingList.value[read
 const showModal = ref(false)
 const showAddNewShelfCom = ref(false);
 const show = ref(false);
+const startUpdatingAbout = ref(false)
+const aboutText = ref('')
+const updateUserAbout = async () => {
+    await userStore.updateAbout(aboutText.value)
+    aboutText.value = ''
+    startUpdatingAbout.value = false
+}
 </script>
 <template>
     <section class=" text-white  bg-Shark pt-4">
@@ -107,16 +114,31 @@ const show = ref(false);
                         <AddQuoteModal></AddQuoteModal>
                     </Modal>
                 </div>
-                <div class="bg-bg-main rounded-lg cursor-default mt-4 p-4">
+                <div class=" relative bg-bg-main rounded-lg cursor-default mt-4 p-4">
+                    <button @click="startUpdatingAbout = true" class="absolute top-4 right-4">
+                        <FontAwesomeIcon :icon="faPen" class=" bg-bg-secondary p-2 rounded-lg cursor-pointer text-sm" />
+                    </button>
                     <p class=" text-2xl font-bold mb-2 ">
                         about :</p>
-                    <p class="font-semibold py-4 px-5 bg-Shark rounded-2xl leading-relaxed">Lorem ipsum dolor sit
-                        amet consectetur
-                        adipisicing
-                        elit.
-                        Eaque omnis,
-                        ex quas nemo
-                        voluptate consequatur, doloremque deleniti cumque, magnam sed corporis. Voluptas</p>
+                    <p v-if="userStore.about"
+                        class="font-semibold wrap-break-word w-2xs  py-4 px-5 bg-Shark rounded-2xl leading-relaxed">
+                        {{ userStore.about }}
+                    </p>
+                    <button v-else @click="startUpdatingAbout = true"
+                        class="bg-primary w-full bg-blue-600/40 cursor-pointer  text-white py-2 px-4 mt-4 rounded-lg hover:bg-blue-600 transition">
+                        Add something about you </button>
+                    <Modal position="center" v-if="startUpdatingAbout" :show="startUpdatingAbout"
+                        @close="startUpdatingAbout = false">
+                        <div class="bg-Shark p-4 rounded-lg">
+                            <h3 class="text-xl text-center w-full font-bold mb-4">Update your about info</h3>
+                            <textarea v-model="aboutText" class="bg-bg-tertiary/30 w-full text-white p-2 rounded-lg" />
+                            <button :disabled="!aboutText.trim()"
+                                :class="[!aboutText.trim() ? 'bg-gray-500 cursor-not-allowed' : 'bg-success/60 cursor-pointer transition hover:bg-success']"
+                                class="  w-full text-white py-2 px-4 mt-4 rounded-lg" @click="updateUserAbout">
+                                Update </button>
+                        </div>
+                    </Modal>
+
                 </div>
                 <div class="bg-bg-main mt-4 p-4 w-full h-fit rounded-lg">
 
@@ -301,7 +323,6 @@ const show = ref(false);
                             <SlideCom v-for="book in userBooks.finishedBooks" :key="book.id">
                                 <BookCardCom :book="book.book"></BookCardCom>
                             </SlideCom>
-
                         </CarouselCom>
                         <BookCardCom v-if="userBooks.finishedBooks.length < 1" :book="userBooks.finishedBooks[0]?.book">
                         </BookCardCom>
