@@ -17,11 +17,9 @@ const addQuote = async () => {
 </script>
 
 <template>
-    <div class="bg-Shark shadow-max fixed z-40 top-3/6 left-3/6 -translate-3/6 p-4 rounded-lg">
+    <div class="bg-Shark p-4 rounded-lg">
         <h3 class="text-xl font-bold mb-4">Add Quote</h3>
-
         <textarea v-model="text" class="bg-bg-tertiary/30 w-full text-white p-2 rounded-lg" />
-
         <button class="bg-success/60 w-full text-white py-2 px-4 mt-4 rounded-lg" @click="addQuote">
             Add Quote
         </button>
