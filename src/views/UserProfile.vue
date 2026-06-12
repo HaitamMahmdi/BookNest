@@ -2,7 +2,6 @@
 /***
  * !TODO:- make the profile editable by the user and allow them to change  name, bio, etc.
  * !TODO:- add a section for the user's friends and allow them to add/remove friends, see their friends' profiles, etc.
- * !TODO:- add a section for the user's favorite books and allow them to add/remove books from their favorites, see their favorite books, etc.
  * !TODO:- add a section for the user's reading history and allow them to see the books they've read, the books they're currently reading, etc.
  * !TODO:- allow the user to add/remove quotes, see his favorite quotes, etc.
  * !TODO:- add/remove authors from their favorites, etc.

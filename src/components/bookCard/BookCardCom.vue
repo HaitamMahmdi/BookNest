@@ -52,13 +52,17 @@ const categories = () => {
   );
   return [...new Set(newCategories.map((cat) => cat.trim()))];
 }
-const confirmDeleteFinishedBook = async () => {
+const confirmDeleteFinishedBook = async (closeModal) => {
   uiStore.showAreYouSureModal(
     "Confirm Action",
     "Are you sure you want to delete this finished book ? all your reading progress and thoughts will be deleted",
-    () => userBooks.deleteFinishedBook(props.book.id),
+    () => {
+      userBooks.deleteFinishedBook(props.book.id)
+      closeModal()
+    },
     () => uiStore.hideAreYouSureModal()
   );
+
 }
 </script>
 <template>
@@ -85,13 +89,13 @@ const confirmDeleteFinishedBook = async () => {
             :container-class="`absolute! top-2  flex items-center justify-center rounded-full right-2`"
             button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
             :options-list-style="`right-0`" :book="props.book" @report="$emit('showInfos')">
-            <template #customOptions>
+            <template #customOptions="{ closeModal }">
               <button v-if="isReading"
                 class="flex w- items-center gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
                 <FontAwesomeIcon :icon="faBookOpen" />
                 <p>Stop reading</p>
               </button>
-              <button @click="confirmDeleteFinishedBook" v-if="isFinished"
+              <button @click="confirmDeleteFinishedBook(closeModal)" v-if="isFinished"
                 class="flex w-50  items-center gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
                 <FontAwesomeIcon :icon="faXmark" />
                 <p>Mark Unfinished</p>

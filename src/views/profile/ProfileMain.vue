@@ -324,11 +324,41 @@ const updateUserAbout = async () => {
                                 <BookCardCom :book="book.book"></BookCardCom>
                             </SlideCom>
                         </CarouselCom>
-                        <BookCardCom v-if="userBooks.finishedBooks.length < 1" :book="userBooks.finishedBooks[0]?.book">
-                        </BookCardCom>
+
                     </div>
+                    <BookCardCom v-if="userBooks.finishedBooks.length === 1" :book="userBooks.finishedBooks[0]?.book">
+                    </BookCardCom>
                     <div class=" w-full container   mx-auto flex items-top justify-center bg-Shark text-white  py-8"
-                        v-else>
+                        v-if="!userBooks.finishedBooks.length">
+                        <RouterLink class="text-2xl h-fit text-center hover:text-success font-bold  transition-colors"
+                            to="/">
+                            <FontAwesomeIcon class="text-4xl p-1" :icon="faBook" />
+
+                            <p>Start reading Now</p>
+
+                        </RouterLink>
+
+                    </div>
+                </div>
+                <div class="mt-8 ">
+                    <!-- !TODO: Improve carousel display -->
+                    <h3
+                        class="  bg-bg-main max-sm:mx-auto mb-4 hover:bg-bg-secondary rounded-2xl transition w-fit font-semibold text-2xl p-4  ">
+                        Favorite books :</h3>
+                    <div v-if="userBooks.favorites.length > 1">
+
+                        <CarouselCom :items-per-view="4" :show-arrows="true">
+                            <SlideCom v-for="book in userBooks.favorites" :key="book.id">
+                                <BookCardCom :book="book.book"></BookCardCom>
+                            </SlideCom>
+                        </CarouselCom>
+
+
+                    </div>
+                    <BookCardCom v-if="userBooks.favorites.length === 1" :book="userBooks.favorites[0]">
+                    </BookCardCom>
+                    <div class=" w-full container   mx-auto flex items-top justify-center bg-Shark text-white  py-8"
+                        v-if="!userBooks.favorites.length">
                         <RouterLink class="text-2xl h-fit text-center hover:text-success font-bold  transition-colors"
                             to="/">
                             <FontAwesomeIcon class="text-4xl p-1" :icon="faBook" />
