@@ -34,6 +34,15 @@ const routes = [
     },
   },
   {
+    path: "/:id/Settings",
+    name: "Settings",
+    component: () => import("../views/Settings.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresEmailVerified: true,
+    },
+  },
+  {
     path: "/Book/:id",
     name: "Book",
     component: () => import("../views/BookView.vue"),

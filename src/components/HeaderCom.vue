@@ -79,10 +79,14 @@ const handleClick = (e) => {
           <p>Premium</p>
         </li>
 
-        <li
-          class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2">
-          <FontAwesomeIcon :icon="faGears" />
-          <p>Settings</p>
+        <li>
+
+          <RouterLink
+            class="flex items-center w-75 hover:pl-8 hover:bg-bg-secondary transform duration-100 pl-4 pr-10 py-4 font-semibold gap-x-2"
+            v-if="userID" :to="{ name: 'Settings', params: { id: userID } }">
+            <FontAwesomeIcon :icon="faGears" />
+            <p>Settings</p>
+          </RouterLink>
         </li>
         <li class="w-full h-0.5 bg-[#dddd]"></li>
         <li
