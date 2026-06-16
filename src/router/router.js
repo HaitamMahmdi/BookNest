@@ -5,7 +5,7 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: () => import("../views/Home.vue"),
+    component: () => import("@/views/Home.vue"),
 
     meta: {
       requiresAuth: true,
@@ -36,16 +36,34 @@ const routes = [
   {
     path: "/:id/Settings",
     name: "Settings",
-    component: () => import("../views/Settings.vue"),
+    component: () => import("@/views/settings/Settings.vue"),
+    redirect: { name: "SettingsMain" },
     meta: {
       requiresAuth: true,
       requiresEmailVerified: true,
     },
+    children: [
+      {
+        path: "",
+        name: "SettingsMain",
+        component: () => import("@/views/settings/SettingsMain.vue"),
+      },
+      {
+        path: "change-password",
+        name: "ChangePassword",
+        component: () => import("@/views/settings/ChangePassword.vue"),
+      },
+      {
+        path: "change-email",
+        name: "ChangeEmail",
+        component: () => import("@/views/settings/ChangeEmail.vue"),
+      },
+    ],
   },
   {
     path: "/Book/:id",
     name: "Book",
-    component: () => import("../views/BookView.vue"),
+    component: () => import("@/views/BookView.vue"),
     meta: {
       requiresAuth: true,
       requiresEmailVerified: true,
@@ -57,7 +75,7 @@ const routes = [
     meta: {
       requiresAuth: false,
     },
-    component: () => import("../views/Auth.vue"),
+    component: () => import("@/views/Auth.vue"),
   },
 ];
 
