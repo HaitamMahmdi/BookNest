@@ -30,7 +30,9 @@ export function useClickOutside(targetRef, callback) {
   };
 
   onMounted(() => {
-    document.addEventListener("click", handler);
+    setTimeout(() => {
+      document.addEventListener("click", handler);
+    }, 0);
   });
 
   onBeforeUnmount(() => {

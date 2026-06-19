@@ -90,8 +90,16 @@ const confirmDeleteFinishedBook = async (closeModal) => {
             button-class="hover:bg-Shark bg-Shark/70 w-10! focus:bg-Shark aspect-square rounded-full"
             :options-list-style="`right-0`" :book="props.book" @report="$emit('showInfos')">
             <template #customOptions="{ closeModal }">
-              <button v-if="isReading"
-                class="flex w- items-center gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
+              <button @click=" uiStore.showAreYouSureModal(
+                `Confirm Action`,
+                `Are you sure you want to stop reading this book ? all your reading progress and thoughts will be deleted`,
+                () => {
+                  userBooks.stopReading(book?.id)
+                  closeModal();
+                },
+                () => uiStore.hideAreYouSureModal(),
+              );" v-if="isReading"
+                class="flex w-50 items-center gap-x-1 cursor-pointer text-error py-2 px-3  transition-all hover:pl-4 hover:bg-error/20">
                 <FontAwesomeIcon :icon="faBookOpen" />
                 <p>Stop reading</p>
               </button>
