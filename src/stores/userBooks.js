@@ -17,7 +17,6 @@ export const useUserBooks = defineStore(`userBooks`, {
     /*
      * Checks if a book is in the user's favorites list */
     isFavorite: (state) => (bookId) => {
-      console.log(bookId);
       return state.favorites.some((book) => book.id === bookId);
     },
     /*
@@ -33,12 +32,14 @@ export const useUserBooks = defineStore(`userBooks`, {
       } else if (!shelfID && bookID) {
         for (const shelf of state.shelves) {
           for (const book of shelf.books) {
-            if (book.id === bookID) {
+            console.log(book === bookID);
+            if (book === bookID) {
               return true;
             }
           }
         }
       }
+      return false;
     },
     /* Checks if a book is finished
      * @param {string} bookID - the Id of the book
@@ -294,7 +295,6 @@ export const useUserBooks = defineStore(`userBooks`, {
       const userRef = doc(db, `users`, authStore.user.uid);
       let book;
       for (const read of this.reading) {
-        console.log(read);
         if (read.book.id === bookObj.id) {
           book = read;
         }
@@ -326,6 +326,34 @@ export const useUserBooks = defineStore(`userBooks`, {
     },
     isReading(bookID) {
       return this.reading.some((book) => book.book.id === bookID);
+    },
+    /*
+     * Stops tracking a book as currently being read.
+     * @param {string} bookID - The ID of the book to remove from the reading list.
+     * @returns {Promise<void>} - Resolves when the update is complete.
+     */
+    async stopReading(bookID) {
+      const authStore = useUserAuth();
+      const uiStore = useUiStore();
+      if (!authStore.user) {
+        return;
+      }
+      const oldReading = this.reading;
+      const updatedReading = this.reading.filter(
+        (record) => record.book.id !== bookID,
+      );
+      try {
+        const userRef = doc(db, "users", authStore.user.uid);
+        this.reading = updatedReading;
+        await updateDoc(userRef, {
+          reading: this.reading,
+        });
+        uiStore.showMessageModal("Stopped reading this book", "success");
+      } catch (error) {
+        this.reading = oldReading;
+        console.error("Error stopping reading:", error);
+        uiStore.showMessageModal("Error stopping reading", "error");
+      }
     },
     /*
      * delete a specific thought (progress entry) from a book.
