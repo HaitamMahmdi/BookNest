@@ -16,27 +16,32 @@ const deleteThought = async () => {
 }
 </script>
 <template>
-    <li
-        class="flex flex-col justify-between gap-4 w-full mx-auto  px-4 border-t border-bg-tertiary bg-linear-to-b from-bg-main to-bg-main/80 rounded-lg py-4">
-        <div class=" flex justify-between items-center border-b border-bg-secondary py-2">
-            <p>{{ props.index }}</p>
-            <div class="flex gap-x-1">
-                <p>page number:</p>
-                <p>{{
-                    props.progress }}</p>
+    <li class="relative mx-auto flex w-full flex-col gap-3 rounded-lg bg-bg-main px-4 py-6     ">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-bg-secondary/70 pb-3">
+            <div class="flex items-center gap-2">
+                <span
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-bg-tertiary/15 text-sm font-semibold text-text-main">
+                    {{ props.index }}
+                </span>
             </div>
+
+            <div class="flex items-center gap-1 text-sm text-text-main/90">
+                <span class="font-medium">page</span>
+                <span class="font-semibold">{{ props.progress }}</span>
+            </div>
+
             <OptionsCom options-list-style="right-0 top-3/6! bg-[#424242]" @delete="deleteThought" :show-hide="false"
                 :show-report="false" :show-finish="false">
             </OptionsCom>
         </div>
 
-
-        <div class="flex w-full items-center flex-col px-2 py-3 ">
-
-            <p :class="[props.textBody ? '' : 'font-semibold']" class=" break-all mt-2 text-center ">{{ props.textBody
-                ||
-                `you add no thoughts` }}</p>
+        <div class="flex w-full items-center justify-center rounded-xl bg-bg-main/40 px-3 py-4">
+            <p :class="[props.textBody ? 'text-text-main/95' : 'font-semibold text-text-main/80']"
+                class="w-full wrap-break-word whitespace-pre-wrap text-center text-sm leading-6">
+                {{ props.textBody || 'You Add No Thoughts' }}
+            </p>
         </div>
-        <p class=" border-t py-2 border-bg-secondary">{{ props.date }}</p>
+
+        <p class="border-t border-bg-secondary/70 pt-2 text-xs text-text-main/60">{{ props.date }}</p>
     </li>
 </template>

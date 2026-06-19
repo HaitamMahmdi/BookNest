@@ -29,8 +29,6 @@ const showCurrentPassword = ref(false);
 const showNewPassword = ref(false);
 const showConfirmPassword = ref(false);
 const isSaving = ref(false);
-const successMessage = ref("");
-const errorMessage = ref("");
 
 const settingsRoute = computed(() => ({
     name: "Settings",
@@ -88,8 +86,6 @@ function validateForm() {
 }
 
 async function savePassword() {
-    successMessage.value = "";
-    errorMessage.value = "";
     if (!validateForm()) {
         return;
     }

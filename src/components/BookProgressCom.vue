@@ -31,7 +31,7 @@ const newProgress = async () => {
 </script>
 <template>
   <form @submit.prevent class="text-text-main">
-    <h3 class="text-lg">your progress :</h3>
+    <h3 class="text-lg">Your progress :</h3>
     <div class=" relative">
       <span class=" absolute block -top-4 right-0">{{ value }}/{{ props.pagesCount }}</span>
       <input :class="[props.isFinished ? 'cursor-default' : 'cursor-pointer']" :disabled="props.isFinished"
@@ -46,7 +46,7 @@ const newProgress = async () => {
               words.length === 150 && e.inputType.startsWith('insert')
                 ? e.preventDefault()
                 : ''
-          " placeholder="your thoughts after today's reading..." type="text" max="150" />
+          " placeholder="Your thoughts after today's reading..." type="text" max="150" />
         <span :class="[words.length === 150 ? 'text-error' : 'text-[#DDD] ']"
           class="text-sm absolute right-4 top-3/6 transform -translate-y-1/2">
           {{ words.length }}/150
@@ -59,11 +59,11 @@ const newProgress = async () => {
           :class="[props.isFinished ? 'bg-green-800 ' : 'bg-green-400 hover:bg-green-500 cursor-pointer transition-colors']"
           class="bg-green-400  max-sm:w-full max-sm:mb-4  text-text-main px-16 block py-2 rounded " />
         <input @click="showPreviousThoughts = !showPreviousThoughts" type="button"
-          :value="showPreviousThoughts && props.thoughts.length ? 'hide previous thoughts' : `see previous thoughts (${props.thoughts?.length})`"
-          class="bg-neutral-800 cursor-pointer text-text-main px-16  block py-2 rounded hover:bg-neutral-700 transition-colors">
+          :value="showPreviousThoughts && props.thoughts.length ? 'Hide previous thoughts' : `See previous thoughts (${props.thoughts?.length})`"
+          class="bg-bg-secondary/50 cursor-pointer text-text-main px-4  max-sm:w-full  block py-2 rounded hover:bg-bg-secondary transition-colors">
         <div class="w-full " v-if="showPreviousThoughts">
           <ul
-            :class="[props.thoughts.length >= 4 ? '  grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4' : ' flex flex-col gap-4']">
+            :class="[props.thoughts.length >= 4 ? '  grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4' : ' flex flex-col gap-4']">
             <ThoughtItemCom v-for="(thought, index) in props.thoughts" :key="thought" :index="index + 1"
               :textBody="thought.thought" :progress="thought.progress" :date="thought.date" :bookID="props.bookID"
               :thoughtID="thought.id" </ThoughtItemCom>

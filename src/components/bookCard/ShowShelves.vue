@@ -36,10 +36,10 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div :class="props.class" ref="container"
-    class="bg-neutral-900 parent w-full min-h-60 h-full overflow-y-scroll absolute min-w-60 bottom-full left-0 rounded-t-lg pb-4  z-10">
+    class="bg-bg-main parent w-full min-h-60 h-full overflow-y-scroll absolute min-w-60 bottom-full left-0 rounded-t-lg pb-4  z-10">
     <ul>
       <li @click="emit('openAddNewShelfCom')"
-        class="flex sticky top-0 border-b-4 border-neutral-900 bg-neutral-700 text-sm cursor-pointer w-full justify-between items-center hover:bg-neutral-500  py-2 px-4  ">
+        class="flex sticky top-0   bg-bg-tertiary text-sm cursor-pointer w-full justify-between items-center hover:bg-bg-tertiary/60  py-2 px-4  ">
         <p>add new shelf</p>
         <FontAwesomeIcon class="text-sm p-1" :icon="faPlus" />
       </li>
@@ -47,8 +47,7 @@ onBeforeUnmount(() => {
         userBooks.isInShelfGetter(shelf.id, props.book.id)
           ? userBooks.removeBookFromShelf(shelf.id, props.book.id)
           : userBooks.addBookToShelf(shelf.id, props.book)
-        "
-        class="flex justify-between cursor-pointer text-sm items-center hover:bg-neutral-700 py-2 px-4 mx-2  rounded-lg"
+        " class="flex justify-between cursor-pointer text-sm items-center hover:bg-neutral-700 py-2 px-4"
         v-for="shelf in shelves" :key="shelf">
         <p>{{ shelf.name }}</p>
         <FontAwesomeIcon v-if="userBooks.isInShelfGetter(shelf.id, props.book.id)" class="text-sm text-star p-1"
@@ -61,7 +60,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .parent::-webkit-scrollbar {
   width: 1px;
-  background-color: rgba(0, 0, 0, 0.562);
+  background-color: var(--color-bg-main);
 }
 
 .parent::-webkit-scrollbar-thumb {

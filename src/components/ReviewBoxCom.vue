@@ -27,7 +27,7 @@ const hide = ref(false);
 </script>
 <template>
   <article v-if="!hide" ref="articleRef" :class="class"
-    class="bg-bg-secondary flex flex-col flex-wrap justify-between min-h-50 px-4 py-4 rounded-lg relative text-white">
+    class=" w-full flex flex-col flex-wrap justify-between min-h-50 px-4 py-4 rounded-lg relative text-white">
     <div class="flex items-center gap-x-1 relative pb-1 border-b border-white">
       <img :src="obj.profileImg" :alt="obj.name" class="w-10 h-10 rounded-full" />
       <div class="grow">
@@ -41,7 +41,7 @@ const hide = ref(false);
         :show-edit="props.isUserReview" :show-finish="false" :show-report="!props.isUserReview"
         @hide="() => hide = true"></OptionsCom>
     </div>
-    <p class="mt-2 h-24 overflow-hidden w-[320px]">
+    <p class="mt-2  overflow-hidden">
       {{ obj.review }}
     </p>
     <div class="mt-4 flex items-center justify-between">
